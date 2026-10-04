@@ -1,0 +1,79 @@
+{
+  "feature_names": [
+    "can_id_norm",
+    "dlc_norm",
+    "d0_norm",
+    "d1_norm",
+    "d2_norm",
+    "d3_norm",
+    "d4_norm",
+    "d5_norm",
+    "d6_norm",
+    "d7_norm",
+    "delta_t_log"
+  ],
+  "window_size": 16,
+  "step_size": 16,
+  "total_raw_frames": 500000,
+  "total_windows": 31250,
+  "split_ratios": {
+    "train": 0.7,
+    "val": 0.15,
+    "test": 0.15
+  },
+  "split_counts": {
+    "train": 21875,
+    "val": 4685,
+    "test": 4690
+  },
+  "class_counts": {
+    "train_attack": 8553,
+    "train_normal": 13322,
+    "val_attack": 1798,
+    "val_normal": 2887,
+    "test_attack": 1790,
+    "test_normal": 2900
+  },
+  "scenario_statistics": {
+    "DoS": {
+      "total_frames": 100000,
+      "total_windows": 6250,
+      "train_windows": 4375,
+      "val_windows": 937,
+      "test_windows": 938,
+      "attack_windows_total": 2735
+    },
+    "Fuzzy": {
+      "total_frames": 100000,
+      "total_windows": 6250,
+      "train_windows": 4375,
+      "val_windows": 937,
+      "test_windows": 938,
+      "attack_windows_total": 2000
+    },
+    "Gear": {
+      "total_frames": 100000,
+      "total_windows": 6250,
+      "train_windows": 4375,
+      "val_windows": 937,
+      "test_windows": 938,
+      "attack_windows_total": 3689
+    },
+    "RPM": {
+      "total_frames": 100000,
+      "total_windows": 6250,
+      "train_windows": 4375,
+      "val_windows": 937,
+      "test_windows": 938,
+      "attack_windows_total": 3717
+    },
+    "Normal": {
+      "total_frames": 100000,
+      "total_windows": 6250,
+      "train_windows": 4375,
+      "val_windows": 937,
+      "test_windows": 938,
+      "attack_windows_total": 0
+    }
+  }
+}

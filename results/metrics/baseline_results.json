@@ -1,0 +1,44 @@
+{
+  "model": "1D-CNN Baseline",
+  "parameters": {
+    "trainable_parameters": 40610,
+    "total_parameters": 40610
+  },
+  "latency": {
+    "batch_size": 128,
+    "mean_batch_latency_ms": 3.5876060009468347,
+    "std_batch_latency_ms": 0.8568448583410849,
+    "mean_per_sample_latency_us": 28.028171882397146
+  },
+  "training_time_seconds": 38.91,
+  "test_metrics": {
+    "accuracy": 0.9961620469083156,
+    "precision": 0.9971941638608305,
+    "recall": 0.9927374301675977,
+    "f1_score": 0.9949608062709966,
+    "false_positive_rate": 0.0017241379310344827,
+    "false_negative_rate": 0.007262569832402235,
+    "true_negatives": 2895,
+    "false_positives": 5,
+    "false_negatives": 13,
+    "true_positives": 1777,
+    "confusion_matrix": [
+      [
+        2895,
+        5
+      ],
+      [
+        13,
+        1777
+      ]
+    ],
+    "roc_auc": 0.9995228279714892
+  },
+  "reproducibility": {
+    "seed": 42,
+    "device": "cpu",
+    "epochs": 10,
+    "batch_size": 128,
+    "lr": 0.001
+  }
+}
