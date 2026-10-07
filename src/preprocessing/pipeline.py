@@ -14,7 +14,7 @@ from .parser import (
     compute_inter_arrival_times,
 )
 
-# Feature names in canonical order
+# Feature names in canonical order (all 11 features normalized to [0.0, 1.0])
 FEATURE_NAMES = [
     "can_id_norm",
     "dlc_norm",
@@ -26,7 +26,7 @@ FEATURE_NAMES = [
     "d5_norm",
     "d6_norm",
     "d7_norm",
-    "delta_t_log",
+    "delta_t_norm",
 ]
 
 
@@ -53,7 +53,7 @@ class CANPreprocessor:
             
         Returns:
             Tuple of:
-              - features: np.ndarray of shape (N, 11), dtype float32
+              - features: np.ndarray of shape (N, 11), dtype float32 in [0.0, 1.0]
               - binary_labels: np.ndarray of shape (N,), dtype int64 (0=Normal, 1=Attack)
               - attack_types: np.ndarray of shape (N,), dtype object
         """
@@ -72,11 +72,15 @@ class CANPreprocessor:
         # 3. Payload bytes (8 bytes normalized to [0, 1])
         payload_norm = parse_hex_payload(df, normalize=True)
 
-        # 4. Inter-arrival time (log-scaled delta-t)
-        delta_t_log = compute_inter_arrival_times(df["Timestamp"].to_numpy())[:, np.newaxis]
+        # 4. Inter-arrival time (leak-free, domain-scaled to [0, 1])
+        delta_t_norm = compute_inter_arrival_times(
+            df["Timestamp"].to_numpy(),
+            normalize_log=True,
+            scale_to_unit_interval=True,
+        )[:, np.newaxis]
 
-        # Combine all 11 features
-        features = np.hstack([can_id_norm, dlc_norm, payload_norm, delta_t_log]).astype(np.float32)
+        # Combine all 11 features: strictly bounded in [0.0, 1.0]
+        features = np.hstack([can_id_norm, dlc_norm, payload_norm, delta_t_norm]).astype(np.float32)
 
         # Binary label: 1 if Flag == 'T' else 0
         binary_labels = (df["Flag"].str.upper() == "T").astype(np.int64).to_numpy()

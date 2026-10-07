@@ -1,6 +1,7 @@
 """
 Automotive CAN Dataset Loader Module
-Supports HCRL Car-Hacking Dataset CSV format and normal run TXT format.
+Supports HCRL Car-Hacking Dataset CSV format (with dynamic variable DLC parsing)
+and normal run TXT format.
 """
 
 from pathlib import Path
@@ -70,52 +71,154 @@ def load_csv_dataset(
     filepath: Union[str, Path],
     nrows: Optional[int] = None,
     attack_name: Optional[str] = None,
-) -> pd.DataFrame:
+    pad_byte: str = "00",
+    return_stats: bool = False,
+    verbose: bool = False,
+) -> Union[pd.DataFrame, Tuple[pd.DataFrame, Dict]]:
     """
-    Load an HCRL CAN dataset CSV file.
+    Load an HCRL CAN dataset CSV file using dynamic, variable-DLC parsing.
     
+    In CAN networks, frames can carry fewer than 8 data bytes (e.g. DLC=2, DLC=5).
+    This function splits each line dynamically by comma, ensuring that:
+      1. Timestamp, CAN_ID, and DLC are correctly identified.
+      2. The payload bytes are parsed strictly according to the stated DLC.
+      3. Missing payload positions up to 8 bytes are padded with `pad_byte` (default '00').
+      4. The Flag ('R' or 'T') is always extracted as the final field and never consumed
+         into payload data.
+      5. Malformed rows are identified, logged in stats, and safely skipped without corruption.
+      
     Args:
         filepath: Path to the CSV file.
-        nrows: Optional limit on number of rows to read.
+        nrows: Optional limit on number of valid rows to read.
         attack_name: Name of attack (e.g. 'DoS', 'Fuzzy') to attach as metadata.
+        pad_byte: Hex string used to pad missing payload bytes up to 8 bytes (default '00').
+        return_stats: If True, returns tuple of (DataFrame, stats_dict).
+        verbose: If True, prints parsing validation statistics.
         
     Returns:
         DataFrame with standardized columns:
         Timestamp, CAN_ID, DLC, DATA[0]..DATA[7], Flag, Attack_Type
+        (or tuple of (DataFrame, stats_dict) if return_stats=True).
     """
     path = Path(filepath)
     if not path.exists():
         raise FileNotFoundError(f"Dataset file not found: {path}")
 
-    # Read CSV without header using defined schema
-    df = pd.read_csv(
-        path,
-        header=None,
-        names=CAN_CSV_COLUMNS,
-        nrows=nrows,
-        dtype=str,
-        low_memory=False,
-    )
-    
-    # Strip whitespace from string columns
-    for col in df.columns:
-        if df[col].dtype == object:
-            df[col] = df[col].astype(str).str.strip()
+    records = []
+    total_rows = 0
+    valid_rows = 0
+    malformed_rows = 0
+    dlc_dist: Dict[int, int] = {}
+
+    with open(path, "r", encoding="utf-8", errors="replace") as f:
+        for line in f:
+            if nrows is not None and valid_rows >= nrows:
+                break
+                
+            line_str = line.strip()
+            if not line_str:
+                continue
+                
+            total_rows += 1
+            tokens = [t.strip() for t in line_str.split(",")]
             
-    # Convert Timestamp to float
-    df["Timestamp"] = pd.to_numeric(df["Timestamp"], errors="coerce")
+            # Minimum structure: Timestamp, CAN_ID, DLC, Flag (at least 4 tokens)
+            if len(tokens) < 4:
+                malformed_rows += 1
+                continue
+                
+            try:
+                # 1. Timestamp (float)
+                ts = float(tokens[0])
+                
+                # 2. CAN ID (hex string, lowercased)
+                can_id = tokens[1].lower()
+                
+                # 3. DLC (integer)
+                dlc = int(tokens[2])
+                
+                # 4. Flag (final field: 'R' for Regular/Normal, 'T' for Target/Attack)
+                flag = tokens[-1].upper()
+                if flag not in ("R", "T"):
+                    # Malformed flag
+                    malformed_rows += 1
+                    continue
+                    
+                # 5. Payload bytes: strictly tokens between DLC and Flag
+                payload = tokens[3:-1]
+                
+                # Validate payload length vs stated DLC
+                if len(payload) != dlc:
+                    if len(payload) > dlc:
+                        payload = payload[:dlc]
+                    else:
+                        malformed_rows += 1
+                        continue
+
+                # 6. Pad missing payload positions up to 8 bytes with pad_byte ('00')
+                if len(payload) < 8:
+                    payload = payload + [pad_byte] * (8 - len(payload))
+                else:
+                    payload = payload[:8]
+
+                records.append([ts, can_id, dlc] + payload + [flag])
+                valid_rows += 1
+                dlc_dist[dlc] = dlc_dist.get(dlc, 0) + 1
+                
+            except (ValueError, TypeError, IndexError):
+                malformed_rows += 1
+                continue
+
+    columns = CAN_CSV_COLUMNS.copy()
+    df = pd.DataFrame(records, columns=columns)
     
-    # Convert DLC to integer
-    df["DLC"] = pd.to_numeric(df["DLC"], errors="coerce").fillna(8).astype(int)
-    
-    # Clean Flag column (typically 'R' for Regular / Normal, 'T' for Target / Attack)
-    df["Flag"] = df["Flag"].str.upper()
+    # Type standardization
+    df["Timestamp"] = df["Timestamp"].astype(np.float64)
+    df["CAN_ID"] = df["CAN_ID"].astype(str)
+    df["DLC"] = df["DLC"].astype(int)
+    for col in DATA_BYTE_COLS:
+        df[col] = df[col].astype(str)
+    df["Flag"] = df["Flag"].astype(str)
     
     # Set Attack_Type column
     attack_label = attack_name if attack_name else path.stem.replace("_dataset", "")
     df["Attack_Type"] = np.where(df["Flag"] == "T", attack_label, "Normal")
+
+    stats = {
+        "file": str(path),
+        "total_rows_read": total_rows,
+        "valid_rows": valid_rows,
+        "malformed_rows": malformed_rows,
+        "dlc_distribution": dict(sorted(dlc_dist.items())),
+        "rows_dlc_lt_8": sum(cnt for d, cnt in dlc_dist.items() if d < 8),
+        "rows_dlc_eq_8": dlc_dist.get(8, 0),
+    }
     
+    df.attrs["parsing_stats"] = stats
+
+    if verbose:
+        print(f"=== CSV Ingestion Summary: {path.name} ===")
+        print(f"  Total rows read: {total_rows:,}")
+        print(f"  Valid rows:      {valid_rows:,}")
+        print(f"  Malformed rows:  {malformed_rows:,}")
+        print(f"  DLC distribution: {stats['dlc_distribution']}")
+        print(f"  Rows with DLC < 8: {stats['rows_dlc_lt_8']:,}")
+        print(f"  Rows with DLC = 8: {stats['rows_dlc_eq_8']:,}")
+
+    if return_stats:
+        return df, stats
     return df
+
+
+def validate_csv_file(
+    filepath: Union[str, Path],
+    nrows: Optional[int] = None,
+) -> Dict:
+    """
+    Quick validation helper to inspect CSV structure and variable DLC statistics.
+    """
+    _, stats = load_csv_dataset(filepath, nrows=nrows, return_stats=True, verbose=False)
+    return stats
 
 
 def load_txt_normal(
@@ -185,4 +288,14 @@ def load_txt_normal(
 
     columns = CAN_CSV_COLUMNS + ["Attack_Type"]
     df = pd.DataFrame(records, columns=columns)
+    
+    # Type standardization
+    df["Timestamp"] = df["Timestamp"].astype(np.float64)
+    df["CAN_ID"] = df["CAN_ID"].astype(str)
+    df["DLC"] = df["DLC"].astype(int)
+    for col in DATA_BYTE_COLS:
+        df[col] = df[col].astype(str)
+    df["Flag"] = df["Flag"].astype(str)
+    df["Attack_Type"] = df["Attack_Type"].astype(str)
+    
     return df

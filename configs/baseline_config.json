@@ -1,0 +1,45 @@
+{
+  "experiment_name": "centralized_1d_cnn_baseline",
+  "seed": 42,
+  "data": {
+    "raw_dir": "data/raw",
+    "processed_dir": "data/processed",
+    "splits_dir": "data/splits",
+    "frames_per_scenario": 100000,
+    "window_size": 16,
+    "step_size": 16,
+    "label_mode": "any",
+    "train_ratio": 0.70,
+    "val_ratio": 0.15,
+    "test_ratio": 0.15,
+    "feature_dim": 11,
+    "normalization": {
+      "can_id_max": 2047.0,
+      "dlc_max": 8.0,
+      "payload_byte_max": 255.0,
+      "delta_t_max_seconds": 1.0,
+      "delta_t_scale": "unit_interval"
+    }
+  },
+  "model": {
+    "architecture": "CAN1DCNN",
+    "in_channels": 11,
+    "seq_length": 16,
+    "num_classes": 2,
+    "conv_channels": [32, 64, 128],
+    "norm_type": "GroupNorm",
+    "num_groups": 4,
+    "fc_hidden": 64,
+    "dropout": 0.2
+  },
+  "training": {
+    "device": "cpu",
+    "epochs": 10,
+    "batch_size": 128,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "optimizer": "Adam",
+    "loss": "CrossEntropyLoss",
+    "checkpoint_metric": "val_f1"
+  }
+}

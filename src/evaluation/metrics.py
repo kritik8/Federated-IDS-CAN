@@ -81,52 +81,93 @@ def compute_classification_metrics(
 def measure_inference_latency(
     model: torch.nn.Module,
     sample_tensor: torch.Tensor,
-    num_warmup: int = 20,
-    num_iterations: int = 100,
+    num_warmup: int = 30,
+    num_iterations: int = 150,
     device: str = "cpu",
 ) -> Dict[str, float]:
     """
-    Measure model inference latency per batch and per individual sample.
+    Measure model inference latency with strict separation between single-sample
+    real-time edge latency (batch_size = 1) and batched throughput (batch_size >= 1).
+    
+    In safety-critical vehicular systems, an ECU cannot buffer 128 windows before
+    running intrusion detection. Real-time deadlines dictate evaluating single-sample
+    latency directly, rather than relying on amortized batch throughput.
     
     Args:
         model: PyTorch model in eval mode.
         sample_tensor: Input tensor of shape (Batch, Seq_Len, Features).
-        num_warmup: Warmup iterations.
-        num_iterations: Timed iterations.
+        num_warmup: Warmup iterations before timing.
+        num_iterations: Timed evaluation iterations.
         device: 'cpu' or 'cuda'.
         
     Returns:
-        Dict with mean batch latency (ms) and sample latency (microseconds).
+        Dictionary with explicit keys:
+          - single_sample_latency_us: Mean latency for batch_size=1 (microseconds)
+          - single_sample_median_us: Median latency for batch_size=1 (microseconds)
+          - single_sample_p95_us: 95th percentile latency for batch_size=1 (microseconds)
+          - batch_latency_ms: Execution time for full input batch (milliseconds)
+          - amortized_batch_latency_us: Batch execution time divided by batch size (microseconds)
+          - throughput_samples_sec: Inferred sequences per second under batching
     """
     model.eval()
     model.to(device)
-    x = sample_tensor.to(device)
-    batch_size = x.size(0)
-
-    # Warmup
+    
+    # 1. Single-sample real-time edge latency profiling (batch_size = 1)
+    x_single = sample_tensor[:1].to(device)
     with torch.no_grad():
         for _ in range(num_warmup):
-            _ = model(x)
-
-    # Benchmarking
-    latencies = []
+            _ = model(x_single)
+            
+    single_latencies = []
     with torch.no_grad():
         for _ in range(num_iterations):
             t0 = time.perf_counter()
-            _ = model(x)
+            _ = model(x_single)
             t1 = time.perf_counter()
-            latencies.append((t1 - t0) * 1000.0)  # ms
+            single_latencies.append((t1 - t0) * 1_000_000.0)  # microseconds
+            
+    single_latencies = np.asarray(single_latencies)
+    single_mean_us = float(np.mean(single_latencies))
+    single_median_us = float(np.median(single_latencies))
+    single_p95_us = float(np.percentile(single_latencies, 95))
 
-    latencies = np.array(latencies)
-    mean_batch_ms = float(np.mean(latencies))
-    std_batch_ms = float(np.std(latencies))
-    mean_sample_us = float((mean_batch_ms / batch_size) * 1000.0)
+    # 2. Batched throughput profiling (e.g. batch_size = 128)
+    x_batch = sample_tensor.to(device)
+    batch_size = x_batch.size(0)
+    with torch.no_grad():
+        for _ in range(num_warmup):
+            _ = model(x_batch)
+            
+    batch_latencies = []
+    with torch.no_grad():
+        for _ in range(num_iterations):
+            t0 = time.perf_counter()
+            _ = model(x_batch)
+            t1 = time.perf_counter()
+            batch_latencies.append((t1 - t0) * 1000.0)  # milliseconds
+            
+    batch_latencies = np.asarray(batch_latencies)
+    mean_batch_ms = float(np.mean(batch_latencies))
+    std_batch_ms = float(np.std(batch_latencies))
+    amortized_batch_us = float((mean_batch_ms / batch_size) * 1000.0)
+    throughput = float(batch_size / (mean_batch_ms / 1000.0)) if mean_batch_ms > 0 else 0.0
 
     return {
+        # Single-sample inference latency (batch_size = 1)
+        "single_sample_latency_us": single_mean_us,
+        "single_sample_median_us": single_median_us,
+        "single_sample_p95_us": single_p95_us,
+        
+        # Batched throughput metrics (batch_size = N)
         "batch_size": batch_size,
-        "mean_batch_latency_ms": mean_batch_ms,
+        "batch_latency_ms": mean_batch_ms,
         "std_batch_latency_ms": std_batch_ms,
-        "mean_per_sample_latency_us": mean_sample_us,
+        "amortized_batch_latency_us": amortized_batch_us,
+        "throughput_samples_sec": throughput,
+        
+        # Backward compatibility aliases
+        "mean_batch_latency_ms": mean_batch_ms,
+        "mean_per_sample_latency_us": amortized_batch_us,
     }
 
 

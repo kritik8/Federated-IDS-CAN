@@ -76,14 +76,30 @@ def compute_inter_arrival_times(
     timestamps: Union[pd.Series, np.ndarray],
     max_delta: float = 1.0,
     normalize_log: bool = True,
+    scale_to_unit_interval: bool = True,
 ) -> np.ndarray:
     """
     Compute inter-arrival time (delta-t) between consecutive CAN frames.
     
+    Scientific Fixes:
+      1. Leakage-Free Initialization (Fix #4):
+         At sequence index 0, no prior frame exists. The delta is deterministically
+         initialized to 0.0. This eliminates the previous forward-looking leakage where
+         np.median(diffs) across all 100,000 frames (including future validation/test frames)
+         was imputed into frame 0.
+         
+      2. Domain-Based [0, 1] Normalization (Fix #3):
+         log1p-transformed delta-t is normalized to [0.0, 1.0] using the fixed theoretical
+         domain upper bound: log10(1.0 + max_delta * 1000.0) ≈ log10(1001.0) ≈ 3.000434.
+         This matches the scale of the other 10 CAN features without relying on empirical sample
+         statistics from train or test sets, preventing feature scale dominance in later
+         distance-based Byzantine aggregation algorithms (e.g. Krum, Trimmed Mean).
+    
     Args:
         timestamps: Series or array of float timestamps in seconds.
         max_delta: Maximum delta clipping threshold in seconds (default 1.0s).
-        normalize_log: If True, apply log1p transform: log10(1 + delta_t * 1000) for scale stability.
+        normalize_log: If True, apply log1p transform: log10(1 + delta_t * 1000).
+        scale_to_unit_interval: If True, scale log1p values to [0.0, 1.0] using fixed domain bound.
         
     Returns:
         1D numpy array of inter-arrival times.
@@ -96,11 +112,18 @@ def compute_inter_arrival_times(
         # Handle non-monotonic timestamps or recording gaps
         diffs = np.clip(diffs, a_min=0.0, a_max=max_delta)
         deltas[1:] = diffs
-        # First packet gets median delta or 0
-        deltas[0] = np.median(diffs) if len(diffs) > 0 else 0.001
+        # FIX #4: Deterministic, leak-free initial state (0.0 ms)
+        deltas[0] = 0.0
+    elif len(ts) == 1:
+        deltas[0] = 0.0
         
     if normalize_log:
         # Scale ms delta using log1p
         deltas = np.log10(1.0 + deltas * 1000.0).astype(np.float32)
         
+        # FIX #3: Fixed theoretical domain normalization into [0.0, 1.0]
+        if scale_to_unit_interval:
+            max_log_bound = np.float32(np.log10(1.0 + max_delta * 1000.0))
+            deltas = np.clip(deltas / max_log_bound, 0.0, 1.0).astype(np.float32)
+            
     return deltas

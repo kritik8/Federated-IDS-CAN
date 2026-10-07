@@ -10,7 +10,7 @@
     "d5_norm",
     "d6_norm",
     "d7_norm",
-    "delta_t_log"
+    "delta_t_norm"
   ],
   "window_size": 16,
   "step_size": 16,
