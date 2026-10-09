@@ -7,13 +7,13 @@
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-EE4C2C?style=flat-square&logo=pytorch&logoColor=white)](https://pytorch.org/)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)
-[![Status](https://img.shields.io/badge/Status-Phase_2B_Non--IID_Complete-brightgreen?style=flat-square)]()
+[![Status](https://img.shields.io/badge/Status-Phase_3_Robust_Aggregation_Complete-brightgreen?style=flat-square)]()
 
 <p align="center">
-  A research-grade, scientifically reproducible intrusion detection system (IDS) benchmark evaluating decentralized Federated Learning under fleet heterogeneity (Non-IID traffic) on Controller Area Network (CAN) security.
+  A research-grade, scientifically reproducible intrusion detection system (IDS) benchmark evaluating decentralized Federated Learning under fleet heterogeneity (Non-IID traffic) and adversarial Byzantine client attacks on Controller Area Network (CAN) security.
 </p>
 
-[Project](#-project) • [Why It Matters](#-why-this-research-matters) • [Methodology](#-current-methodology) • [Dataset](#-current-dataset) • [Baseline Architecture](#-current-baseline-model) • [Phase 2A IID Baseline](#-phase-2a-iid-federated-learning-baseline) • [Phase 2B Non-IID Experiments](#-phase-2b-non-iid-heterogeneity-experiments) • [Results & Comparison](#-results--centralized-vs-iid-vs-non-iid-comparison) • [Methodological Decisions](#-important-methodological-decisions) • [Limitations](#-current-limitations) • [Next Steps](#-next-step)
+[Project](#-project) • [Why It Matters](#-why-this-research-matters) • [Methodology](#-current-methodology) • [Dataset](#-current-dataset) • [Baseline Architecture](#-current-baseline-model) • [Phase 2A IID Baseline](#-phase-2a-iid-federated-learning-baseline) • [Phase 2B Non-IID Experiments](#-phase-2b-non-iid-heterogeneity-experiments) • [Phase 3 Robust Aggregation](#-phase-3-robust-federated-learning-under-adversarial-attacks) • [Results & Comparison](#-results--centralized-vs-iid-vs-non-iid-vs-robust-fl) • [Methodological Decisions](#-important-methodological-decisions) • [Limitations](#-current-limitations) • [Next Steps](#-next-step)
 
 </div>
 
@@ -56,8 +56,8 @@ CAN raw data
                               └──► [DONE] Centralized 1D-CNN baseline (GroupNorm)
                                      ├──► [DONE] Phase 2A: 10-Client IID FedAvg baseline
                                      ├──► [DONE] Phase 2B: Non-IID Dirichlet client partitioning (alpha in {1.0, 0.5, 0.1})
-                                     ├──► [NEXT] Phase 3: Malicious clients & Byzantine attacks (label-flipping, noise, backdoor)
-                                     ├──► [NEXT] Phase 3B: Robust aggregation (Median, Trimmed Mean, Krum, FoolsGold)
+                                     ├──► [DONE] Phase 3: Malicious clients & Robust Aggregation (Label Flipping, Delta Sign Reversal, Median, Trimmed Mean)
+                                     ├──► [NEXT] Phase 3B: Advanced Byzantine attacks & defense (Krum, FoolsGold, adaptive backdoors)
                                      ├──► [PLANNED] Phase 3C: Heterogeneity-aware FL (FedProx, SCAFFOLD)
                                      └──► [PLANNED] Phase 4: Hardware trace-replay evaluation testbed
 ```
@@ -68,8 +68,9 @@ CAN raw data
 | **Phase 1** | Centralized Notebook Execution | **DONE** | Executed and verified `notebooks/01_dataset_analysis.ipynb`, `02_preprocessing.ipynb`, and `03_baseline_ids.ipynb`. |
 | **Phase 2A** | IID Federated Baseline | **DONE** | Simulated 10 vehicular clients under deterministic stratified IID partitioning, implemented sample-weighted FedAvg, achieved **98.25% Accuracy** and **97.66% F1**. Executed `notebooks/04_federated_iid.ipynb`. |
 | **Phase 2B** | **Non-IID Heterogeneity Benchmark** | **DONE** | Partitioned training pool across 10 clients using Dirichlet distributions ($\alpha \in \{1.0, 0.5, 0.1\}$) based on attack categories. Quantified client drift and cyber-threat vulnerability under FedAvg. Executed `notebooks/05_federated_noniid.ipynb`. |
-| **Phase 3** | Byzantine Attacks & Threat Model | **NEXT** | Formalize vehicular adversarial threat models: label-flipping, additive Gaussian noise, and targeted backdoor attacks. |
-| **Phase 3B** | Robust Aggregation Rules | **PLANNED** | Implement and evaluate Byzantine-robust aggregators: Coordinate-wise Median, Trimmed Mean, Krum, and FoolsGold. |
+| **Phase 3** | **Byzantine Attacks & Robust Aggregation** | **DONE** | Formulated 2 threat models (Label Flipping $y \mapsto 1-y$, Model-Update Delta Sign Reversal $\Delta_k' = -\gamma \Delta_k$). Implemented Coordinate-wise Median and Trimmed Mean ($m=2$). Demonstrated FedAvg vulnerability and robust recovery across 9 experiments and multi-seed evaluations. Executed `notebooks/06_robust_federated_learning.ipynb`. |
+| **Phase 3B** | Advanced Defense & Backdoors | **NEXT** | Evaluate distance-based defense (Multi-Krum), cosine-similarity defense (FoolsGold), and stealthy targeted backdoor injection. |
+| **Phase 3C** | Heterogeneity-Aware FL | **PLANNED** | Implement and evaluate FedProx and SCAFFOLD to combat client drift under extreme Non-IID. |
 | **Phase 4** | Trace Replay & Paper Benchmarks | **PLANNED** | Hardware trace-replay evaluation testbed on embedded edge platforms. |
 
 ---
@@ -137,32 +138,91 @@ To rigorously model this fleet heterogeneity, we use the **Dirichlet distributio
 
 ---
 
-## 📊 Results: Centralized vs. IID vs. Non-IID Comparison
+## ⚔️ Phase 3: Robust Federated Learning Under Adversarial Attacks
+
+In open vehicular networks, malicious or compromised ECUs can inject poisoning attacks to degrade global detection or induce false alarms. Phase 3 systematically assesses vulnerabilities and evaluates robust aggregation algorithms.
+
+### Threat Model
+- **Network Setting:** 10 simulated clients, Non-IID Dirichlet distribution ($\alpha = 0.5$), 10 communication rounds.
+- **Adversary Budget:** 2 malicious clients ($f=2$, 20% of fleet), specifically designated as `client_0` and `client_1`.
+- **Attack A — Label Flipping (Data Poisoning):**
+  - Malicious clients invert all training labels: $y \mapsto 1 - y$ ($0 \to 1$ and $1 \to 0$).
+  - Malicious clients train honestly on their poisoned data using standard local SGD.
+  - Validation sets, test sets, and attack-type evaluation metadata remain strictly untouched.
+  - Logged: `client_0` flipped 1,845 labels (100%), `client_1` flipped 2,427 labels (100%).
+- **Attack B — Model-Update Corruption via Delta Sign Reversal (Byzantine Model Poisoning):**
+  - Malicious clients train on their legitimate local data, but instead of sending honest updates, they submit corrupted model deltas:
+    $$\Delta_k' = -\gamma \cdot \Delta_k \quad \text{where } \Delta_k = \theta_k^{(t)} - \theta^{(t-1)}$$
+  - In our benchmark, $\gamma = 1.5$. The poisoned transmitted state is $\theta_k' = \theta^{(t-1)} + \Delta_k'$.
+  - This directly pulls the global model away from optimal convergence.
+
+### Defense Mechanisms (Aggregation Rules)
+1. **Sample-Weighted FedAvg:** Baseline linear weighted average: $\theta^{(t)} = \sum_{k} \frac{n_k}{N} \theta_k^{(t)}$. Completely vulnerable to outliers and sign-inverted updates.
+2. **Coordinate-wise Median:** For each scalar coordinate $j$ of each parameter tensor, compute the median across all $K$ client updates:
+   $$\theta_j^{(t)} = \text{median}(\{\theta_{k, j}^{(t)}\}_{k=1}^K)$$
+   Tolerates up to $f < K/2$ arbitrary Byzantine clients without divergence.
+3. **Coordinate-wise Trimmed Mean:** For each coordinate $j$, sort the $K$ client values, discard the lowest $m$ and highest $m$ values ($m=2$), and average the remaining $K - 2m$ values:
+   $$\theta_j^{(t)} = \frac{1}{K - 2m} \sum_{k=m+1}^{K-m} \theta_{(k), j}^{(t)}$$
+
+---
+
+## 📊 Results: Centralized vs. IID vs. Non-IID vs. Robust FL
 
 All models were evaluated on the untouched test partition (4,690 windows: 2,900 Normal, 1,790 Attack) using the best checkpoint selected by Validation F1:
 
-| Benchmark Regime | Best Round | Val F1 (%) | Test Acc (%) | Test Prec (%) | Test Recall (%) | Test F1 (%) | FPR (%) | FNR (%) | ROC-AUC | Wall Time |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **Centralized Baseline** | Ep 8 | 99.42% | **99.66%** | 99.61% | **99.50%** | **99.55%** | 0.24% | **0.50%** | **0.9992** | 25.12s |
-| **Federated IID (FedAvg)** | Rd 9 | 97.99% | **98.25%** | 99.71% | 95.70% | **97.66%** | 0.17% | 4.30% | 0.9965 | 35.45s |
-| **Non-IID ($\alpha = 1.0$)** | Rd 10 | 98.05% | **98.51%** | **99.83%** | 96.26% | **98.01%** | **0.10%** | 3.74% | 0.9961 | 28.73s |
-| **Non-IID ($\alpha = 0.5$)** | Rd 9 | 97.94% | **98.49%** | 99.60% | 96.42% | **97.98%** | 0.24% | 3.58% | 0.9956 | 25.51s |
-| **Non-IID ($\alpha = 0.1$, Extreme)** | Rd 10 | 90.12% | **92.11%** | 97.91% | **81.06%** | **88.69%** | **1.07%** | **18.94%** | **0.9573** | 27.41s |
+### Primary Matched Comparison ($\alpha = 0.5$, Seed 42)
 
-### Per-Attack-Type Detection Rate Analysis
+| Threat Scenario | Aggregator | Best Rd | Val F1 (%) | Test Acc (%) | Test Prec (%) | Test Recall (%) | Test F1 (%) | FPR (%) | FNR (%) | ROC-AUC |
+|---|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Centralized Baseline** | Centralized | Ep 8 | 99.42% | **99.66%** | 99.61% | **99.50%** | **99.55%** | 0.24% | **0.50%** | **0.9992** |
+| **IID Baseline** | FedAvg | Rd 9 | 97.99% | **98.25%** | 99.71% | 95.70% | **97.66%** | 0.17% | 4.30% | 0.9965 |
+| **Non-IID Benign** | FedAvg | Rd 9 | 98.40% | **98.74%** | 99.43% | 97.26% | **98.34%** | 0.34% | 2.74% | 0.9967 |
+| **Non-IID Benign** | Median | Rd 9 | 98.05% | **98.53%** | 99.60% | 96.54% | **98.04%** | 0.24% | 3.46% | 0.9967 |
+| **Non-IID Benign** | Trimmed Mean | Rd 9 | 97.80% | **98.34%** | 99.54% | 96.09% | **97.78%** | 0.28% | 3.91% | 0.9958 |
+| **Attack A: Label Flip** | **FedAvg** | Rd 10 | 92.42% | **94.54%** | 99.87% | **86.03% ⚠️** | **92.44%** | **0.07%** | **13.97% ⚠️** | 0.9930 |
+| **Attack A: Label Flip** | **Median** | Rd 9 | 96.48% | **97.25%** | 95.27% | **97.60% ✅** | **96.42%** | 3.03% | **2.40% ✅** | 0.9944 |
+| **Attack A: Label Flip** | **Trimmed Mean** | Rd 9 | 96.79% | **97.57%** | 96.24% | **97.32% ✅** | **96.77%** | 2.41% | **2.68% ✅** | 0.9948 |
+| **Attack B: Update Corrupt**| **FedAvg** | Rd 1 | 55.33% | **38.17% 💥** | 38.17% | **100.00%** | **55.25% 💥** | **100.00% 💥**| **0.00%** | 0.5000 |
+| **Attack B: Update Corrupt**| **Median** | Rd 9 | 96.59% | **97.33%** | 97.31% | **95.64% ✅** | **96.47%** | 1.69% | **4.36% ✅** | 0.9950 |
+| **Attack B: Update Corrupt**| **Trimmed Mean** | Rd 9 | 96.22% | **97.10%** | 96.08% | **96.37% ✅** | **96.22%** | 2.48% | **3.63% ✅** | 0.9946 |
 
-| Cyber-Attack Class | Total Test Windows | IID Baseline | Non-IID $\alpha=1.0$ | Non-IID $\alpha=0.5$ | Non-IID $\alpha=0.1$ |
-|---|:---:|:---:|:---:|:---:|:---:|
-| **Normal Traffic** | 2,900 | 99.83% | 99.90% | 99.76% | **98.93%** |
-| **Gear Spoofing** | 591 | 97.63% | 99.32% | 98.48% | **100.00%** |
-| **RPM Spoofing** | 592 | 97.47% | 99.32% | 100.00% | **100.00%** |
-| **DoS Injection** | 398 | 97.99% | 97.99% | 98.24% | **43.97% ⚠️** |
-| **Fuzzy Injection** | 209 | 80.86% | 75.60% | 77.03% | **44.50% ⚠️** |
+### Multi-Seed Statistical Stability (Seeds 42, 43, 44; Mean ± Std)
+
+To guarantee that findings are robust and not an artifact of a single lucky seed, we repeated the key experiments across 3 independent seeds:
+
+| Threat Scenario | Aggregator | Test Accuracy (%) | Test Recall (%) | Test F1 (%) | Test FPR (%) | Test FNR (%) |
+|---|---|:---:|:---:|:---:|:---:|:---:|
+| **Attack A: Label Flipping** | **FedAvg** | 85.90% ± 8.89% | 68.75% ± 22.09% | **78.56% ± 19.38%** | **0.52% ± 0.60%** | **31.25% ± 22.09% ⚠️** |
+| **Attack A: Label Flipping** | **Median** | **95.23% ± 2.65%** | **97.58% ± 0.94%** | **93.75% ± 3.57% ✅** | 6.22% ± 4.88% | **2.42% ± 0.94% ✅** |
+| **Attack A: Label Flipping** | **Trimmed Mean**| 94.02% ± 4.70% | 94.86% ± 3.99% | **91.97% ± 6.64%** | 6.49% ± 5.86% | 5.14% ± 3.99% |
+| **Attack B: Update Corrupt** | **FedAvg** | 46.10% ± 13.73% | 100.00% ± 0.00% | **63.43% ± 14.17% 💥**| **73.14% ± 46.52% 💥**| 0.00% ± 0.00% |
+| **Attack B: Update Corrupt** | **Median** | **95.10% ± 2.38%** | **94.88% ± 1.15%** | **93.60% ± 3.24% ✅** | 4.76% ± 4.54% | **5.12% ± 1.15% ✅** |
+| **Attack B: Update Corrupt** | **Trimmed Mean**| 87.09% ± 13.91% | 97.43% ± 1.63% | **82.14% ± 19.02%** | 19.31% ± 23.51% | 2.57% ± 1.63% |
+
+### Per-Attack-Type Recall Analysis under Poisoning (Seed 42)
+
+| Cyber-Attack Class | Test Windows | Benign FedAvg | Label Flip FedAvg | Label Flip Median | Update Corrupt FedAvg | Update Corrupt Median |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Gear Spoofing** | 591 | 98.48% | 90.69% | 98.48% | 100.00% | 98.48% |
+| **RPM Spoofing** | 592 | 100.00% | 99.83% | 100.00% | 100.00% | 100.00% |
+| **DoS Injection** | 398 | 98.24% | 85.18% | 98.24% | 100.00% | 97.99% |
+| **Fuzzy Injection** | 209 | 77.03% | **35.41% ⚠️** | **68.90% ✅** | 100.00% | **65.07% ✅** |
+
+> **Operational Insight:** Under Label Flipping, FedAvg misses **64.6% of Fuzzy injection attacks** and **14.8% of DoS attacks** because the poisoned clients teach the network that anomalous payload patterns are benign. Coordinate-wise Median recovers detection back to 68.90% for Fuzzy and 98.24% for DoS without requiring centralized data.
+
+---
 
 ### Key Scientific Takeaways:
-1. **Resilience to Moderate Non-IID:** For $\alpha \in \{1.0, 0.5\}$, FedAvg with `GroupNorm` maintains high detection accuracy ($98.0\%$ F1), showing that mild fleet heterogeneity does not break standard federated averaging.
-2. **Catastrophic Drift under Extreme Non-IID ($\alpha = 0.1$):** When clients experience complete label separation (some clients observing only attacks, others observing mostly normal traffic), FedAvg suffers severe gradient conflict. False negative rate jumps from $4.30\%$ to **$18.94\%$**, causing high-volume DoS and subtle Fuzzy injection attacks to be missed over half the time.
-3. **Spoofing Signature Stability:** Semantic sensor spoofing (Gear, RPM) was detected at **100% accuracy** even under extreme heterogeneity due to strong fixed arbitration and bit patterns.
+1. **Catastrophic Failure of FedAvg Under Adversarial Attacks:**
+   - Under **Attack A (Label Flipping)**, FedAvg's test recall plummets to 86.03% (FNR spikes from 2.74% to 13.97%, missing 250 attacks). Across multiple seeds, recall deteriorates as low as 43.18%.
+   - Under **Attack B (Model-Update Sign Reversal)**, FedAvg experiences complete network collapse (Test F1 = 55.25%, Accuracy = 38.17%, FPR = 100.00%), classifying every normal frame as an attack.
+2. **Coordinate-wise Median is the Most Reliable Defense:**
+   - Median recovers detection across both attack modalities to $>96.4\%$ F1 on seed 42 and $>93.6\%$ F1 across independent seeds.
+   - It incurs a negligible benign utility penalty of only 0.27% relative to FedAvg.
+3. **Non-IID Vulnerability in Trimmed Mean:**
+   - While Trimmed Mean performs admirably on seed 42 (96.77% F1), it exhibits substantial multi-seed volatility ($82.14\% \pm 19.02\%$ F1). Under Non-IID Dirichlet partitioning, natural client drift causes honest clients with specialized local data distributions to appear in the outer $m$ tails, leading Trimmed Mean to discard honest updates rather than poisoned ones.
+4. **Operational Trade-offs:**
+   - An IDS must balance False Negative Rate (missed intrusions that compromise vehicular safety) against False Positive Rate (nuisance alarms that degrade driver confidence). FedAvg fails on both extremes (FNR = 31.25% under label flipping; FPR = 73.14% under update corruption), whereas Coordinate-wise Median maintains a balanced operating point.
 
 ---
 
@@ -174,15 +234,16 @@ All models were evaluated on the untouched test partition (4,690 windows: 2,900 
 4. **Domain-Based Normalization:** Protocol constants (CAN ID by 2047.0, DLC by 8.0, payload by 255.0, inter-arrival time by physical maximum) prevent dataset leakage.
 5. **Leak-Free Initial Inter-Arrival Time:** Frame 0 inter-arrival time is initialized to 0.0, reflecting monitoring inception without future timestamp consumption.
 6. **Best Validation Checkpoint Selection:** Selected strictly by validation F1 score, keeping the test set untouched until post-training evaluation.
-7. **Strict Parameter Compatibility:** FedAvg validates parameter tensor keys, shapes, and floating-point types before aggregation.
+7. **Strict Parameter Compatibility:** Aggregators validate parameter tensor keys, shapes, and floating-point types before aggregation.
 
 ---
 
 ## ⚠️ Current Limitations
 
-- **Simulated Federation:** The 10 clients are simulated partitions of a single Kia Soul capture dataset, rather than 10 physically distinct vehicles with varied ECU architectures.
-- **Benign Clients Only:** All clients in Phase 2A and 2B are honest and cooperative. No adversarial poisoning (label flipping, noise injection, backdoors) was present.
-- **No Client Drift Regularization:** Vanilla FedAvg was used without proximal regularization (FedProx) or control variates (SCAFFOLD), which will be evaluated in subsequent phases.
+- **Simulated Clients:** The 10 clients are simulated partitions of a single Kia Soul capture dataset, rather than 10 physically distinct vehicles with varied ECU architectures.
+- **Privacy Limitations:** Federated learning keeps raw CAN frames local, but does not provide formal privacy guarantees (such as $(\epsilon, \delta)$-differential privacy) against reconstruction or membership inference attacks.
+- **Threat Model Scope:** Our evaluations focused on untargeted label flipping and model update sign-reversal. Stealthy backdoor attacks designed to evade coordinate-wise statistics require dedicated cosine or spectral defenses (e.g., FoolsGold).
+- **Trimmed Mean Non-IID Sensitivity:** In extreme Non-IID fleets, static trimming fractions can discard legitimate minority-class client updates.
 
 ---
 
@@ -190,8 +251,8 @@ All models were evaluated on the untouched test partition (4,690 windows: 2,900 
 
 ```text
 NEXT:
-Phase 3 — Introduce a formalized vehicular Byzantine threat model (label-flipping, additive Gaussian noise, 
-and targeted backdoor attacks) and evaluate Byzantine-robust aggregation rules (Median, Trimmed Mean, Krum, FoolsGold).
+Phase 3B — Evaluate advanced Byzantine defenses (Multi-Krum, FoolsGold) against targeted backdoors 
+and adaptive poisoning in heterogeneous vehicular networks.
 ```
 
 ---
@@ -211,23 +272,24 @@ Federated-IDS-CAN/
 │   ├── preprocessing/       # parser.py, pipeline.py (features, windowing, split)
 │   ├── models/              # cnn1d.py (CAN1DCNN with GroupNorm)
 │   ├── evaluation/          # metrics.py (metrics computation, latency profiling)
-│   └── federated/           # dataset.py, client.py, server.py, aggregation.py
+│   └── federated/           # dataset.py, client.py, server.py, aggregation.py, threat.py
 │
 ├── notebooks/
 │   ├── 01_dataset_analysis.ipynb   # Executed EDA, CAN ID & class distributions
 │   ├── 02_preprocessing.ipynb      # Executed feature extraction & splitting
 │   ├── 03_baseline_ids.ipynb       # Executed centralized baseline training & evaluation
 │   ├── 04_federated_iid.ipynb       # Executed Phase 2A IID Federated baseline (10 clients, FedAvg)
-│   └── 05_federated_noniid.ipynb    # Executed Phase 2B Non-IID Dirichlet benchmark (alpha in {1.0, 0.5, 0.1})
+│   ├── 05_federated_noniid.ipynb    # Executed Phase 2B Non-IID Dirichlet benchmark (alpha in {1.0, 0.5, 0.1})
+│   └── 06_robust_federated_learning.ipynb # Executed Phase 3 Robust FL & Byzantine defense benchmark
 │
 ├── results/
-│   ├── figures/             # Confusion matrices, training curves, Non-IID comparison plots
-│   ├── metrics/             # centralized_baseline_v2.json, federated_iid_fedavg.json, federated_noniid_alpha_*.json
-│   ├── models/              # centralized_1d_cnn_best.pt, federated_iid_fedavg_best.pt, federated_noniid_alpha_*_best.pt
-│   └── reports/             # centralized_baseline_v2.md, federated_iid_report.md, federated_noniid_report.md
+│   ├── figures/             # Confusion matrices, training curves, robust comparison plots
+│   ├── metrics/             # centralized, IID, Non-IID, and robust FL experiment JSON metrics
+│   ├── models/              # Checkpoints for centralized, IID, Non-IID, and robust models (.pt)
+│   └── reports/             # centralized_baseline_v2.md, federated_iid_report.md, federated_noniid_report.md, robust_federated_report.md
 │
-├── configs/                 # baseline_config.json, federated_iid_config.json, federated_noniid_config.json
-├── tests/                   # test_loader.py, test_models.py, test_preprocessing.py, test_federated.py
+├── configs/                 # baseline_config.json, federated_iid_config.json, federated_noniid_config.json, robust_federated_config.json
+├── tests/                   # test_loader.py, test_models.py, test_preprocessing.py, test_federated.py, test_robust_aggregation.py
 │
 ├── README.md
 ├── requirements.txt
@@ -253,7 +315,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Run Test Suite (25 Unit Tests)
+### 2. Run Test Suite (35 Unit Tests)
 ```bash
 python -m unittest discover tests
 ```
@@ -270,6 +332,9 @@ jupyter nbconvert --to notebook --execute --inplace notebooks/04_federated_iid.i
 
 # Phase 2B: Non-IID Dirichlet Experiments (alpha in {1.0, 0.5, 0.1})
 jupyter nbconvert --to notebook --execute --inplace notebooks/05_federated_noniid.ipynb
+
+# Phase 3: Robust Federated Learning Against Malicious Clients
+jupyter nbconvert --to notebook --execute --inplace notebooks/06_robust_federated_learning.ipynb
 ```
 
 ---

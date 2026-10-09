@@ -15,7 +15,7 @@ from torch.utils.data import DataLoader, TensorDataset
 
 from ..models.cnn1d import CAN1DCNN, count_parameters
 from ..evaluation.metrics import compute_classification_metrics, plot_training_curves, plot_confusion_matrix
-from .aggregation import fedavg_aggregate, calculate_round_communication_bytes
+from .aggregation import fedavg_aggregate, aggregate_updates, calculate_round_communication_bytes
 from .client import FederatedClient
 
 
@@ -40,10 +40,14 @@ class FederatedServer:
         device: Union[str, torch.device] = "cpu",
         eval_batch_size: int = 128,
         seed: int = 42,
+        aggregation_method: str = "fedavg",
+        aggregation_kwargs: Optional[Dict[str, Any]] = None,
     ):
         self.device = torch.device(device)
         self.eval_batch_size = eval_batch_size
         self.seed = seed
+        self.aggregation_method = aggregation_method
+        self.aggregation_kwargs = aggregation_kwargs or {}
         self.model_config = model_config or {}
 
         # Set seeds for deterministic server initialization
@@ -174,6 +178,8 @@ class FederatedServer:
         num_rounds: int,
         local_epochs: int = 1,
         verbose: bool = True,
+        aggregation_method: Optional[str] = None,
+        **kwargs: Any,
     ) -> Dict[str, Any]:
         """
         Run the complete federated training loop across rounds.
@@ -182,7 +188,7 @@ class FederatedServer:
           1. Broadcasts identical global parameters to all clients.
           2. Each client trains locally for `local_epochs`.
           3. Collects updated client parameters and sample counts.
-          4. Aggregates updates via sample-weighted FedAvg.
+          4. Aggregates updates via the configured aggregation rule (FedAvg, Median, Trimmed Mean).
           5. Updates master global model.
           6. Evaluates global model on untouched validation set.
           7. Tracks best validation F1 checkpoint.
@@ -191,6 +197,8 @@ class FederatedServer:
             num_rounds: Number of federated communication rounds.
             local_epochs: Number of local epochs each client performs per round.
             verbose: If True, prints round-by-round progress.
+            aggregation_method: Optional override for aggregation algorithm.
+            **kwargs: Extra parameters for aggregation (e.g. trim_ratio).
             
         Returns:
             Dictionary containing training history and best round metadata.
@@ -198,9 +206,12 @@ class FederatedServer:
         if not self.clients:
             raise RuntimeError("No clients registered. Call register_clients() first.")
 
+        agg_method = (aggregation_method or self.aggregation_method).lower().strip()
+        agg_kwargs = {**self.aggregation_kwargs, **kwargs}
+
         if verbose:
             print("=" * 70)
-            print(f"STARTING FEDERATED TRAINING: {num_rounds} Rounds, {len(self.clients)} Clients (IID FedAvg)")
+            print(f"STARTING FEDERATED TRAINING: {num_rounds} Rounds, {len(self.clients)} Clients ({agg_method})")
             print(f"Device: {self.device} | Local Epochs/Round: {local_epochs} | Seed: {self.seed}")
             print("=" * 70)
 
@@ -225,8 +236,12 @@ class FederatedServer:
 
             mean_train_loss = float(np.mean(client_losses))
 
-            # 3. Federated Aggregation via FedAvg
-            aggregated_params = fedavg_aggregate(client_updates)
+            # 3. Federated Aggregation via configured rule
+            aggregated_params = aggregate_updates(
+                client_updates,
+                method=agg_method,
+                **agg_kwargs,
+            )
 
             # 4. Update master global model
             self.set_global_parameters(aggregated_params)

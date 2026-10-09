@@ -1,0 +1,2540 @@
+{
+  "benign_fedavg": {
+    "exp_name": "benign_fedavg",
+    "seed": 42,
+    "attack_type": "none",
+    "aggregator": "fedavg",
+    "malicious_client_ids": [],
+    "malicious_stats": [],
+    "best_round": 10,
+    "best_val_f1": 0.981706,
+    "test_metrics": {
+      "accuracy": 0.9872068230277186,
+      "precision": 0.9959862385321101,
+      "recall": 0.970391061452514,
+      "f1_score": 0.9830220713073005,
+      "false_positive_rate": 0.002413793103448276,
+      "false_negative_rate": 0.029608938547486034,
+      "true_negatives": 2893,
+      "false_positives": 7,
+      "false_negatives": 53,
+      "true_positives": 1737,
+      "confusion_matrix": [
+        [
+          2893,
+          7
+        ],
+        [
+          53,
+          1737
+        ]
+      ],
+      "roc_auc": 0.9963581198227701,
+      "test_loss": 0.046262739635289096
+    },
+    "per_attack_eval": {
+      "DoS": {
+        "total": 398,
+        "correct": 391,
+        "errors": 7,
+        "accuracy": 0.9824
+      },
+      "Fuzzy": {
+        "total": 209,
+        "correct": 167,
+        "errors": 42,
+        "accuracy": 0.799
+      },
+      "Gear": {
+        "total": 591,
+        "correct": 587,
+        "errors": 4,
+        "accuracy": 0.9932
+      },
+      "Normal": {
+        "total": 2900,
+        "correct": 2893,
+        "errors": 7,
+        "accuracy": 0.9976
+      },
+      "RPM": {
+        "total": 592,
+        "correct": 592,
+        "errors": 0,
+        "accuracy": 1.0
+      }
+    },
+    "history": {
+      "round": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "train_loss": [
+        0.5536647795072682,
+        0.3172942314205275,
+        0.2599711347766487,
+        0.27293799847126243,
+        0.22639013223073592,
+        0.21102549526452757,
+        0.16324044464055146,
+        0.15827426004180273,
+        0.14279707720730458,
+        0.12408846422884996
+      ],
+      "val_loss": [
+        0.3681415739792261,
+        0.14291286776388976,
+        0.11066066898174957,
+        0.08706474167273928,
+        0.08526301107974674,
+        0.07660499086390819,
+        0.06334730203769377,
+        0.053147885765534454,
+        0.052232918441454654,
+        0.0443952908160974
+      ],
+      "val_accuracy": [
+        0.9312700106723586,
+        0.9607257203842049,
+        0.9671291355389541,
+        0.9741728922091782,
+        0.9745997865528282,
+        0.9773745997865528,
+        0.9801494130202775,
+        0.984418356456777,
+        0.983778014941302,
+        0.9861259338313767
+      ],
+      "val_precision": [
+        0.9511002444987775,
+        0.9843937575030012,
+        0.9969770253929867,
+        0.989492119089317,
+        0.9982195845697329,
+        0.9982332155477032,
+        0.9976649153531816,
+        0.994269340974212,
+        0.9953970080552359,
+        0.9937321937321937
+      ],
+      "val_recall": [
+        0.8654060066740823,
+        0.9121245828698554,
+        0.9171301446051168,
+        0.942714126807564,
+        0.9354838709677419,
+        0.942714126807564,
+        0.9505005561735261,
+        0.9649610678531702,
+        0.9621802002224694,
+        0.9699666295884316
+      ],
+      "val_f1": [
+        0.9062317996505533,
+        0.9468822170900693,
+        0.955388180764774,
+        0.96553688407861,
+        0.9658340511053689,
+        0.9696796338672768,
+        0.9735118199943036,
+        0.9793959920970928,
+        0.9785067873303167,
+        0.9817056009006473
+      ],
+      "round_duration_seconds": [
+        5.0925,
+        2.8104,
+        2.5721,
+        2.458,
+        2.5334,
+        2.5865,
+        2.5128,
+        2.5158,
+        2.4692,
+        2.4146
+      ],
+      "communication": [
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        }
+      ]
+    },
+    "duration_seconds": 27.98,
+    "communication": {
+      "model_size_bytes": 162440.0,
+      "model_size_kb": 158.63,
+      "downlink_bytes": 1624400.0,
+      "uplink_bytes": 1624400.0,
+      "total_round_bytes": 3248800.0,
+      "total_round_kb": 3172.66,
+      "total_round_mb": 3.0983
+    }
+  },
+  "benign_median": {
+    "exp_name": "benign_median",
+    "seed": 42,
+    "attack_type": "none",
+    "aggregator": "median",
+    "malicious_client_ids": [],
+    "malicious_stats": [],
+    "best_round": 10,
+    "best_val_f1": 0.978224,
+    "test_metrics": {
+      "accuracy": 0.9850746268656716,
+      "precision": 0.9880817253121453,
+      "recall": 0.9726256983240223,
+      "f1_score": 0.9802927927927928,
+      "false_positive_rate": 0.007241379310344828,
+      "false_negative_rate": 0.027374301675977653,
+      "true_negatives": 2879,
+      "false_positives": 21,
+      "false_negatives": 49,
+      "true_positives": 1741,
+      "confusion_matrix": [
+        [
+          2879,
+          21
+        ],
+        [
+          49,
+          1741
+        ]
+      ],
+      "roc_auc": 0.9956166441918707,
+      "test_loss": 0.05488143874320394
+    },
+    "per_attack_eval": {
+      "DoS": {
+        "total": 398,
+        "correct": 391,
+        "errors": 7,
+        "accuracy": 0.9824
+      },
+      "Fuzzy": {
+        "total": 209,
+        "correct": 171,
+        "errors": 38,
+        "accuracy": 0.8182
+      },
+      "Gear": {
+        "total": 591,
+        "correct": 587,
+        "errors": 4,
+        "accuracy": 0.9932
+      },
+      "Normal": {
+        "total": 2900,
+        "correct": 2879,
+        "errors": 21,
+        "accuracy": 0.9928
+      },
+      "RPM": {
+        "total": 592,
+        "correct": 592,
+        "errors": 0,
+        "accuracy": 1.0
+      }
+    },
+    "history": {
+      "round": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "train_loss": [
+        0.5536647795072682,
+        0.3978826182930533,
+        0.31391630915864377,
+        0.2772115161329481,
+        0.24539442699045763,
+        0.19792509633742655,
+        0.1378751200120236,
+        0.13479956107942198,
+        0.15543929218366853,
+        0.12411226662639044
+      ],
+      "val_loss": [
+        0.522584699159498,
+        0.27130207837963816,
+        0.18752268339361172,
+        0.14004403468352628,
+        0.11344420702505774,
+        0.08960301023346383,
+        0.0696318524974133,
+        0.06110315078127982,
+        0.05496532084020759,
+        0.051222652214377516
+      ],
+      "val_accuracy": [
+        0.9094983991462113,
+        0.9255069370330843,
+        0.9453575240128068,
+        0.9558164354322305,
+        0.9716115261472785,
+        0.9728922091782284,
+        0.9799359658484526,
+        0.9812166488794023,
+        0.9833511205976521,
+        0.9833511205976521
+      ],
+      "val_precision": [
+        0.9654471544715447,
+        0.8982957669048928,
+        0.9961389961389961,
+        0.9981214777708203,
+        0.9911504424778761,
+        0.9712351945854484,
+        0.9896551724137931,
+        0.984144960362401,
+        0.9891922639362912,
+        0.9820627802690582
+      ],
+      "val_recall": [
+        0.7925472747497219,
+        0.9087875417130145,
+        0.8609566184649611,
+        0.8865406006674083,
+        0.9343715239154616,
+        0.9577308120133482,
+        0.9577308120133482,
+        0.9666295884315906,
+        0.9671857619577308,
+        0.9744160177975528
+      ],
+      "val_f1": [
+        0.870494807574832,
+        0.903511197124689,
+        0.9236276849642004,
+        0.9390279823269514,
+        0.9619238476953907,
+        0.9644357322878745,
+        0.9734313171283211,
+        0.9753086419753086,
+        0.9780652418447694,
+        0.9782244556113903
+      ],
+      "round_duration_seconds": [
+        2.5252,
+        2.4669,
+        2.4587,
+        2.5242,
+        2.6202,
+        2.525,
+        2.5407,
+        2.5179,
+        2.4941,
+        2.4846
+      ],
+      "communication": [
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        }
+      ]
+    },
+    "duration_seconds": 25.17,
+    "communication": {
+      "model_size_bytes": 162440.0,
+      "model_size_kb": 158.63,
+      "downlink_bytes": 1624400.0,
+      "uplink_bytes": 1624400.0,
+      "total_round_bytes": 3248800.0,
+      "total_round_kb": 3172.66,
+      "total_round_mb": 3.0983
+    }
+  },
+  "benign_trimmed_mean": {
+    "exp_name": "benign_trimmed_mean",
+    "seed": 42,
+    "attack_type": "none",
+    "aggregator": "trimmed_mean",
+    "malicious_client_ids": [],
+    "malicious_stats": [],
+    "best_round": 10,
+    "best_val_f1": 0.977954,
+    "test_metrics": {
+      "accuracy": 0.9833688699360341,
+      "precision": 0.9942263279445728,
+      "recall": 0.9620111731843576,
+      "f1_score": 0.9778534923339012,
+      "false_positive_rate": 0.0034482758620689655,
+      "false_negative_rate": 0.03798882681564246,
+      "true_negatives": 2890,
+      "false_positives": 10,
+      "false_negatives": 68,
+      "true_positives": 1722,
+      "confusion_matrix": [
+        [
+          2890,
+          10
+        ],
+        [
+          68,
+          1722
+        ]
+      ],
+      "roc_auc": 0.9955237911770372,
+      "test_loss": 0.057740771011121746
+    },
+    "per_attack_eval": {
+      "DoS": {
+        "total": 398,
+        "correct": 390,
+        "errors": 8,
+        "accuracy": 0.9799
+      },
+      "Fuzzy": {
+        "total": 209,
+        "correct": 162,
+        "errors": 47,
+        "accuracy": 0.7751
+      },
+      "Gear": {
+        "total": 591,
+        "correct": 580,
+        "errors": 11,
+        "accuracy": 0.9814
+      },
+      "Normal": {
+        "total": 2900,
+        "correct": 2890,
+        "errors": 10,
+        "accuracy": 0.9966
+      },
+      "RPM": {
+        "total": 592,
+        "correct": 590,
+        "errors": 2,
+        "accuracy": 0.9966
+      }
+    },
+    "history": {
+      "round": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "train_loss": [
+        0.5536647795072682,
+        0.3946164771858898,
+        0.30850956139899166,
+        0.27461352618589874,
+        0.2382874056659788,
+        0.19963289574297843,
+        0.14759424476792177,
+        0.1303144608530841,
+        0.1733923954658517,
+        0.13913496172680742
+      ],
+      "val_loss": [
+        0.5333502150268921,
+        0.27547865084421164,
+        0.17867651971230003,
+        0.13132277198827635,
+        0.10553824098794666,
+        0.08603797068018287,
+        0.0716201730986924,
+        0.06574973967343792,
+        0.06246168479053035,
+        0.05471559924450221
+      ],
+      "val_accuracy": [
+        0.9173959445037353,
+        0.9218783351120597,
+        0.9457844183564568,
+        0.9624332977588047,
+        0.9720384204909285,
+        0.9765208110992529,
+        0.9775880469583778,
+        0.9801494130202775,
+        0.9805763073639274,
+        0.9833511205976521
+      ],
+      "val_precision": [
+        0.9368421052631579,
+        0.8824786324786325,
+        0.9967824967824968,
+        0.9951159951159951,
+        0.9911608721272834,
+        0.9811858608893956,
+        0.9779785431959345,
+        0.9965055329062318,
+        0.997667638483965,
+        0.9942528735632183
+      ],
+      "val_recall": [
+        0.8414905450500556,
+        0.9187986651835373,
+        0.8615127919911012,
+        0.9065628476084538,
+        0.9354838709677419,
+        0.957174638487208,
+        0.9632925472747497,
+        0.9516129032258065,
+        0.9516129032258065,
+        0.9621802002224694
+      ],
+      "val_f1": [
+        0.8866100205098154,
+        0.9002724795640327,
+        0.9242243436754176,
+        0.9487776484284052,
+        0.9625178826895565,
+        0.9690315315315315,
+        0.9705799943961894,
+        0.9735419630156472,
+        0.9740962140620553,
+        0.9779536461277558
+      ],
+      "round_duration_seconds": [
+        2.5756,
+        2.4935,
+        2.5946,
+        2.5607,
+        2.6781,
+        2.5524,
+        2.4846,
+        2.4874,
+        2.5379,
+        2.546
+      ],
+      "communication": [
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        }
+      ]
+    },
+    "duration_seconds": 25.52,
+    "communication": {
+      "model_size_bytes": 162440.0,
+      "model_size_kb": 158.63,
+      "downlink_bytes": 1624400.0,
+      "uplink_bytes": 1624400.0,
+      "total_round_bytes": 3248800.0,
+      "total_round_kb": 3172.66,
+      "total_round_mb": 3.0983
+    }
+  },
+  "label_flip_fedavg": {
+    "exp_name": "label_flip_fedavg",
+    "seed": 42,
+    "attack_type": "label_flipping",
+    "aggregator": "fedavg",
+    "malicious_client_ids": [
+      8,
+      9
+    ],
+    "malicious_stats": [
+      {
+        "client_id": 8,
+        "is_malicious": true,
+        "attack_type": "label_flipping",
+        "scaling_factor": 1.0,
+        "label_flip_details": {
+          "num_samples": 3572,
+          "original_normal": 2536,
+          "original_attack": 1036,
+          "flipped_normal": 1036,
+          "flipped_attack": 2536,
+          "flipped_percentage": 100.0
+        }
+      },
+      {
+        "client_id": 9,
+        "is_malicious": true,
+        "attack_type": "label_flipping",
+        "scaling_factor": 1.0,
+        "label_flip_details": {
+          "num_samples": 5101,
+          "original_normal": 3518,
+          "original_attack": 1583,
+          "flipped_normal": 1583,
+          "flipped_attack": 3518,
+          "flipped_percentage": 100.0
+        }
+      }
+    ],
+    "best_round": 10,
+    "best_val_f1": 0.933491,
+    "test_metrics": {
+      "accuracy": 0.9462686567164179,
+      "precision": 0.9987029831387808,
+      "recall": 0.8603351955307262,
+      "f1_score": 0.9243697478991597,
+      "false_positive_rate": 0.000689655172413793,
+      "false_negative_rate": 0.13966480446927373,
+      "true_negatives": 2898,
+      "false_positives": 2,
+      "false_negatives": 250,
+      "true_positives": 1540,
+      "confusion_matrix": [
+        [
+          2898,
+          2
+        ],
+        [
+          250,
+          1540
+        ]
+      ],
+      "roc_auc": 0.9932094008861491,
+      "test_loss": 0.2571922561634324
+    },
+    "per_attack_eval": {
+      "DoS": {
+        "total": 398,
+        "correct": 383,
+        "errors": 15,
+        "accuracy": 0.9623
+      },
+      "Fuzzy": {
+        "total": 209,
+        "correct": 171,
+        "errors": 38,
+        "accuracy": 0.8182
+      },
+      "Gear": {
+        "total": 591,
+        "correct": 556,
+        "errors": 35,
+        "accuracy": 0.9408
+      },
+      "Normal": {
+        "total": 2900,
+        "correct": 2898,
+        "errors": 2,
+        "accuracy": 0.9993
+      },
+      "RPM": {
+        "total": 592,
+        "correct": 430,
+        "errors": 162,
+        "accuracy": 0.7264
+      }
+    },
+    "history": {
+      "round": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "train_loss": [
+        0.5700964863621548,
+        0.5015396432637019,
+        0.4308310316737279,
+        0.33831453673747724,
+        0.26286759896287404,
+        0.20704825755063822,
+        0.1598983926160626,
+        0.13727746196939083,
+        0.1228393634087599,
+        0.10393833011720341
+      ],
+      "val_loss": [
+        0.9587647407006555,
+        0.7428744517719987,
+        1.135658675400399,
+        0.507490284278146,
+        0.8645758891181986,
+        0.3693686440666559,
+        0.5815333269321804,
+        0.2860430149697443,
+        0.4235399041511715,
+        0.2473587346465
+      ],
+      "val_accuracy": [
+        0.34044823906083244,
+        0.616221985058698,
+        0.359871931696905,
+        0.6168623265741728,
+        0.38463180362860194,
+        0.8215581643543223,
+        0.7129135538954109,
+        0.9462113127001067,
+        0.9383137673425828,
+        0.951974386339381
+      ],
+      "val_precision": [
+        0.35586791610887997,
+        0.0,
+        0.36868576426853267,
+        1.0,
+        0.3832580159242522,
+        1.0,
+        0.5746293245469523,
+        0.9980670103092784,
+        0.8939947780678851,
+        0.9962145110410094
+      ],
+      "val_recall": [
+        0.8870967741935484,
+        0.0,
+        0.9377085650723026,
+        0.0016685205784204673,
+        0.9905450500556173,
+        0.5350389321468298,
+        0.9699666295884316,
+        0.8615127919911012,
+        0.9521690767519466,
+        0.8781979977753059
+      ],
+      "val_f1": [
+        0.5079617834394905,
+        0.0,
+        0.5292732695024329,
+        0.003331482509716824,
+        0.5526764934057409,
+        0.6971014492753623,
+        0.7217049451686324,
+        0.9247761194029851,
+        0.9221653649340156,
+        0.9334909843334319
+      ],
+      "round_duration_seconds": [
+        2.7125,
+        2.5383,
+        2.5928,
+        2.5745,
+        2.5173,
+        2.5677,
+        2.5646,
+        2.5694,
+        2.5604,
+        2.5097
+      ],
+      "communication": [
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        }
+      ]
+    },
+    "duration_seconds": 25.72,
+    "communication": {
+      "model_size_bytes": 162440.0,
+      "model_size_kb": 158.63,
+      "downlink_bytes": 1624400.0,
+      "uplink_bytes": 1624400.0,
+      "total_round_bytes": 3248800.0,
+      "total_round_kb": 3172.66,
+      "total_round_mb": 3.0983
+    }
+  },
+  "label_flip_median": {
+    "exp_name": "label_flip_median",
+    "seed": 42,
+    "attack_type": "label_flipping",
+    "aggregator": "median",
+    "malicious_client_ids": [
+      8,
+      9
+    ],
+    "malicious_stats": [
+      {
+        "client_id": 8,
+        "is_malicious": true,
+        "attack_type": "label_flipping",
+        "scaling_factor": 1.0,
+        "label_flip_details": {
+          "num_samples": 3572,
+          "original_normal": 2536,
+          "original_attack": 1036,
+          "flipped_normal": 1036,
+          "flipped_attack": 2536,
+          "flipped_percentage": 100.0
+        }
+      },
+      {
+        "client_id": 9,
+        "is_malicious": true,
+        "attack_type": "label_flipping",
+        "scaling_factor": 1.0,
+        "label_flip_details": {
+          "num_samples": 5101,
+          "original_normal": 3518,
+          "original_attack": 1583,
+          "flipped_normal": 1583,
+          "flipped_attack": 3518,
+          "flipped_percentage": 100.0
+        }
+      }
+    ],
+    "best_round": 9,
+    "best_val_f1": 0.965897,
+    "test_metrics": {
+      "accuracy": 0.9714285714285714,
+      "precision": 0.9504896626768227,
+      "recall": 0.975977653631285,
+      "f1_score": 0.9630650496141124,
+      "false_positive_rate": 0.031379310344827584,
+      "false_negative_rate": 0.024022346368715083,
+      "true_negatives": 2809,
+      "false_positives": 91,
+      "false_negatives": 43,
+      "true_positives": 1747,
+      "confusion_matrix": [
+        [
+          2809,
+          91
+        ],
+        [
+          43,
+          1747
+        ]
+      ],
+      "roc_auc": 0.994460219610865,
+      "test_loss": 0.09737216853129584
+    },
+    "per_attack_eval": {
+      "DoS": {
+        "total": 398,
+        "correct": 391,
+        "errors": 7,
+        "accuracy": 0.9824
+      },
+      "Fuzzy": {
+        "total": 209,
+        "correct": 179,
+        "errors": 30,
+        "accuracy": 0.8565
+      },
+      "Gear": {
+        "total": 591,
+        "correct": 585,
+        "errors": 6,
+        "accuracy": 0.9898
+      },
+      "Normal": {
+        "total": 2900,
+        "correct": 2809,
+        "errors": 91,
+        "accuracy": 0.9686
+      },
+      "RPM": {
+        "total": 592,
+        "correct": 592,
+        "errors": 0,
+        "accuracy": 1.0
+      }
+    },
+    "history": {
+      "round": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "train_loss": [
+        0.5700964863621548,
+        0.48403424043957016,
+        0.40890020214050915,
+        0.38456610208595177,
+        0.3306372143616026,
+        0.2986198288457612,
+        0.29496208457610723,
+        0.27563154719941263,
+        0.263867911204696,
+        0.26162908335225366
+      ],
+      "val_loss": [
+        0.6924067448272013,
+        0.39783367968801503,
+        0.5415218272738421,
+        0.295906805317837,
+        0.16234791460770046,
+        0.12926617430139375,
+        0.11737802944035769,
+        0.10064173338252935,
+        0.0855728094357691,
+        0.09461223222593615
+      ],
+      "val_accuracy": [
+        0.3893276414087513,
+        0.8828175026680897,
+        0.6770544290288154,
+        0.8862326574172892,
+        0.9556029882604056,
+        0.959871931696905,
+        0.9620064034151548,
+        0.9690501600853789,
+        0.9735325506937033,
+        0.9671291355389541
+      ],
+      "val_precision": [
+        0.38591972526293195,
+        1.0,
+        0.5435114503816794,
+        0.7817371937639198,
+        0.923773987206823,
+        0.9295624332977588,
+        0.9285714285714286,
+        0.9450726978998385,
+        0.955386289445049,
+        0.9335443037974683
+      ],
+      "val_recall": [
+        1.0,
+        0.6946607341490545,
+        0.9899888765294772,
+        0.9760845383759733,
+        0.9638487208008899,
+        0.9688542825361512,
+        0.9760845383759733,
+        0.9760845383759733,
+        0.9766407119021134,
+        0.9844271412680756
+      ],
+      "val_f1": [
+        0.5569149759950441,
+        0.8198227765014768,
+        0.7017543859649122,
+        0.8681672025723473,
+        0.9433859553620033,
+        0.94880174291939,
+        0.9517353579175705,
+        0.960328317373461,
+        0.9658965896589659,
+        0.9583107742284787
+      ],
+      "round_duration_seconds": [
+        2.5711,
+        2.5585,
+        2.4789,
+        2.5602,
+        2.6157,
+        2.5746,
+        2.5872,
+        2.6644,
+        2.6253,
+        2.5793
+      ],
+      "communication": [
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        }
+      ]
+    },
+    "duration_seconds": 25.82,
+    "communication": {
+      "model_size_bytes": 162440.0,
+      "model_size_kb": 158.63,
+      "downlink_bytes": 1624400.0,
+      "uplink_bytes": 1624400.0,
+      "total_round_bytes": 3248800.0,
+      "total_round_kb": 3172.66,
+      "total_round_mb": 3.0983
+    }
+  },
+  "label_flip_trimmed_mean": {
+    "exp_name": "label_flip_trimmed_mean",
+    "seed": 42,
+    "attack_type": "label_flipping",
+    "aggregator": "trimmed_mean",
+    "malicious_client_ids": [
+      8,
+      9
+    ],
+    "malicious_stats": [
+      {
+        "client_id": 8,
+        "is_malicious": true,
+        "attack_type": "label_flipping",
+        "scaling_factor": 1.0,
+        "label_flip_details": {
+          "num_samples": 3572,
+          "original_normal": 2536,
+          "original_attack": 1036,
+          "flipped_normal": 1036,
+          "flipped_attack": 2536,
+          "flipped_percentage": 100.0
+        }
+      },
+      {
+        "client_id": 9,
+        "is_malicious": true,
+        "attack_type": "label_flipping",
+        "scaling_factor": 1.0,
+        "label_flip_details": {
+          "num_samples": 5101,
+          "original_normal": 3518,
+          "original_attack": 1583,
+          "flipped_normal": 1583,
+          "flipped_attack": 3518,
+          "flipped_percentage": 100.0
+        }
+      }
+    ],
+    "best_round": 9,
+    "best_val_f1": 0.971492,
+    "test_metrics": {
+      "accuracy": 0.9750533049040512,
+      "precision": 0.9618995030369961,
+      "recall": 0.9731843575418995,
+      "f1_score": 0.9675090252707581,
+      "false_positive_rate": 0.02379310344827586,
+      "false_negative_rate": 0.026815642458100558,
+      "true_negatives": 2831,
+      "false_positives": 69,
+      "false_negatives": 48,
+      "true_positives": 1742,
+      "confusion_matrix": [
+        [
+          2831,
+          69
+        ],
+        [
+          48,
+          1742
+        ]
+      ],
+      "roc_auc": 0.9945569254478906,
+      "test_loss": 0.09166178445635574
+    },
+    "per_attack_eval": {
+      "DoS": {
+        "total": 398,
+        "correct": 390,
+        "errors": 8,
+        "accuracy": 0.9799
+      },
+      "Fuzzy": {
+        "total": 209,
+        "correct": 179,
+        "errors": 30,
+        "accuracy": 0.8565
+      },
+      "Gear": {
+        "total": 591,
+        "correct": 582,
+        "errors": 9,
+        "accuracy": 0.9848
+      },
+      "Normal": {
+        "total": 2900,
+        "correct": 2831,
+        "errors": 69,
+        "accuracy": 0.9762
+      },
+      "RPM": {
+        "total": 592,
+        "correct": 591,
+        "errors": 1,
+        "accuracy": 0.9983
+      }
+    },
+    "history": {
+      "round": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "train_loss": [
+        0.5700964863621548,
+        0.48537166113212377,
+        0.39915571000237493,
+        0.4066952380366238,
+        0.31534594330560956,
+        0.31520084456345393,
+        0.30094746350694224,
+        0.2750487291142374,
+        0.2640237184645147,
+        0.24860773111534568
+      ],
+      "val_loss": [
+        0.7077287968983645,
+        0.40800764967181513,
+        0.7112159501017731,
+        0.2609702409522383,
+        0.20568648934237094,
+        0.21669922612265563,
+        0.10620312427062235,
+        0.14590635905907018,
+        0.08168577838414762,
+        0.12454012636186727
+      ],
+      "val_accuracy": [
+        0.38377801494130204,
+        0.8830309498399146,
+        0.5338313767342583,
+        0.935752401280683,
+        0.9351120597652081,
+        0.9240128068303095,
+        0.9707577374599786,
+        0.9498399146211313,
+        0.9780149413020277,
+        0.9547491995731057
+      ],
+      "val_precision": [
+        0.38377801494130204,
+        1.0,
+        0.4514098690835851,
+        0.8782213239009601,
+        0.8705357142857143,
+        0.8436606291706387,
+        0.9540732640787315,
+        0.8948964123294593,
+        0.9669421487603306,
+        0.9033570701932858
+      ],
+      "val_recall": [
+        1.0,
+        0.6952169076751946,
+        0.9972191323692993,
+        0.9666295884315906,
+        0.9760845383759733,
+        0.9844271412680756,
+        0.9705228031145717,
+        0.9849833147942157,
+        0.9760845383759733,
+        0.9877641824249166
+      ],
+      "val_f1": [
+        0.5546814746259447,
+        0.8202099737532809,
+        0.6214904679376083,
+        0.9203071220545407,
+        0.9202936549554274,
+        0.9086242299794661,
+        0.9622277364212848,
+        0.9377813079163357,
+        0.9714918350401328,
+        0.9436769394261424
+      ],
+      "round_duration_seconds": [
+        2.6339,
+        2.574,
+        2.5822,
+        2.5629,
+        2.7639,
+        2.5784,
+        2.5622,
+        2.5721,
+        2.6157,
+        2.5761
+      ],
+      "communication": [
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        }
+      ]
+    },
+    "duration_seconds": 26.03,
+    "communication": {
+      "model_size_bytes": 162440.0,
+      "model_size_kb": 158.63,
+      "downlink_bytes": 1624400.0,
+      "uplink_bytes": 1624400.0,
+      "total_round_bytes": 3248800.0,
+      "total_round_kb": 3172.66,
+      "total_round_mb": 3.0983
+    }
+  },
+  "update_corrupt_fedavg": {
+    "exp_name": "update_corrupt_fedavg",
+    "seed": 42,
+    "attack_type": "model_update_corruption",
+    "aggregator": "fedavg",
+    "malicious_client_ids": [
+      8,
+      9
+    ],
+    "malicious_stats": [
+      {
+        "client_id": 8,
+        "is_malicious": true,
+        "attack_type": "model_update_corruption",
+        "scaling_factor": 1.0
+      },
+      {
+        "client_id": 9,
+        "is_malicious": true,
+        "attack_type": "model_update_corruption",
+        "scaling_factor": 1.0
+      }
+    ],
+    "best_round": 2,
+    "best_val_f1": 0.554681,
+    "test_metrics": {
+      "accuracy": 0.3816631130063966,
+      "precision": 0.3816631130063966,
+      "recall": 1.0,
+      "f1_score": 0.5524691358024691,
+      "false_positive_rate": 1.0,
+      "false_negative_rate": 0.0,
+      "true_negatives": 0,
+      "false_positives": 2900,
+      "false_negatives": 0,
+      "true_positives": 1790,
+      "confusion_matrix": [
+        [
+          0,
+          2900
+        ],
+        [
+          0,
+          1790
+        ]
+      ],
+      "roc_auc": 0.5860917934887304,
+      "test_loss": 0.7252264905077562
+    },
+    "per_attack_eval": {
+      "DoS": {
+        "total": 398,
+        "correct": 398,
+        "errors": 0,
+        "accuracy": 1.0
+      },
+      "Fuzzy": {
+        "total": 209,
+        "correct": 209,
+        "errors": 0,
+        "accuracy": 1.0
+      },
+      "Gear": {
+        "total": 591,
+        "correct": 591,
+        "errors": 0,
+        "accuracy": 1.0
+      },
+      "Normal": {
+        "total": 2900,
+        "correct": 0,
+        "errors": 2900,
+        "accuracy": 0.0
+      },
+      "RPM": {
+        "total": 592,
+        "correct": 592,
+        "errors": 0,
+        "accuracy": 1.0
+      }
+    },
+    "history": {
+      "round": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "train_loss": [
+        0.5536647795072682,
+        0.6049211381988655,
+        0.6077363023726493,
+        0.6184654361857469,
+        0.6350980728835129,
+        0.6782488061050372,
+        0.7047237052444462,
+        0.7555976861844422,
+        0.7656863106895194,
+        0.7936599630560935
+      ],
+      "val_loss": [
+        0.6962421949543337,
+        0.7250306221693277,
+        0.7934483522030434,
+        0.95814870986511,
+        1.18319811795539,
+        1.2891716435726577,
+        1.440322950886306,
+        1.4754060937602593,
+        1.490536911892153,
+        1.4695233689046594
+      ],
+      "val_accuracy": [
+        0.37950907150480256,
+        0.38377801494130204,
+        0.38377801494130204,
+        0.38377801494130204,
+        0.38377801494130204,
+        0.38377801494130204,
+        0.38377801494130204,
+        0.38377801494130204,
+        0.38377801494130204,
+        0.38356456776947706
+      ],
+      "val_precision": [
+        0.3491156462585034,
+        0.38377801494130204,
+        0.38377801494130204,
+        0.38377801494130204,
+        0.38377801494130204,
+        0.38377801494130204,
+        0.38377801494130204,
+        0.38377801494130204,
+        0.38377801494130204,
+        0.3836464560204953
+      ],
+      "val_recall": [
+        0.7135706340378198,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.9994438264738599
+      ],
+      "val_f1": [
+        0.46884706742188925,
+        0.5546814746259447,
+        0.5546814746259447,
+        0.5546814746259447,
+        0.5546814746259447,
+        0.5546814746259447,
+        0.5546814746259447,
+        0.5546814746259447,
+        0.5546814746259447,
+        0.5544585004628201
+      ],
+      "round_duration_seconds": [
+        2.5613,
+        2.5355,
+        2.5601,
+        2.6514,
+        2.5186,
+        2.5111,
+        2.5505,
+        2.4895,
+        2.471,
+        2.5454
+      ],
+      "communication": [
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        }
+      ]
+    },
+    "duration_seconds": 25.4,
+    "communication": {
+      "model_size_bytes": 162440.0,
+      "model_size_kb": 158.63,
+      "downlink_bytes": 1624400.0,
+      "uplink_bytes": 1624400.0,
+      "total_round_bytes": 3248800.0,
+      "total_round_kb": 3172.66,
+      "total_round_mb": 3.0983
+    }
+  },
+  "update_corrupt_median": {
+    "exp_name": "update_corrupt_median",
+    "seed": 42,
+    "attack_type": "model_update_corruption",
+    "aggregator": "median",
+    "malicious_client_ids": [
+      8,
+      9
+    ],
+    "malicious_stats": [
+      {
+        "client_id": 8,
+        "is_malicious": true,
+        "attack_type": "model_update_corruption",
+        "scaling_factor": 1.0
+      },
+      {
+        "client_id": 9,
+        "is_malicious": true,
+        "attack_type": "model_update_corruption",
+        "scaling_factor": 1.0
+      }
+    ],
+    "best_round": 9,
+    "best_val_f1": 0.967507,
+    "test_metrics": {
+      "accuracy": 0.9731343283582089,
+      "precision": 0.971655328798186,
+      "recall": 0.9575418994413408,
+      "f1_score": 0.9645469893078221,
+      "false_positive_rate": 0.017241379310344827,
+      "false_negative_rate": 0.042458100558659215,
+      "true_negatives": 2850,
+      "false_positives": 50,
+      "false_negatives": 76,
+      "true_positives": 1714,
+      "confusion_matrix": [
+        [
+          2850,
+          50
+        ],
+        [
+          76,
+          1714
+        ]
+      ],
+      "roc_auc": 0.9933912540936236,
+      "test_loss": 0.09828990205709359
+    },
+    "per_attack_eval": {
+      "DoS": {
+        "total": 398,
+        "correct": 389,
+        "errors": 9,
+        "accuracy": 0.9774
+      },
+      "Fuzzy": {
+        "total": 209,
+        "correct": 164,
+        "errors": 45,
+        "accuracy": 0.7847
+      },
+      "Gear": {
+        "total": 591,
+        "correct": 576,
+        "errors": 15,
+        "accuracy": 0.9746
+      },
+      "Normal": {
+        "total": 2900,
+        "correct": 2850,
+        "errors": 50,
+        "accuracy": 0.9828
+      },
+      "RPM": {
+        "total": 592,
+        "correct": 585,
+        "errors": 7,
+        "accuracy": 0.9882
+      }
+    },
+    "history": {
+      "round": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "train_loss": [
+        0.5536647795072682,
+        0.4910572873752854,
+        0.367247284683751,
+        0.2897825210958252,
+        0.27195934243095443,
+        0.2104500379273638,
+        0.18741584166898234,
+        0.15325207792793272,
+        0.17933262969293753,
+        0.13240645884504829
+      ],
+      "val_loss": [
+        0.665809995413081,
+        0.48182878811687646,
+        0.313700795892463,
+        0.2012807230080459,
+        0.18380643681820835,
+        0.1472483571018455,
+        0.11162852834484747,
+        0.09157700040551617,
+        0.08738413358478943,
+        0.08438750719502489
+      ],
+      "val_accuracy": [
+        0.6514407684098186,
+        0.8076840981856991,
+        0.9334044823906084,
+        0.9502668089647812,
+        0.9635005336179295,
+        0.9635005336179295,
+        0.9728922091782284,
+        0.9748132337246531,
+        0.9752401280683031,
+        0.9743863393810032
+      ],
+      "val_precision": [
+        0.5246489393486704,
+        1.0,
+        0.8910526315789473,
+        0.9936908517350158,
+        0.9609065155807366,
+        0.9506925207756233,
+        0.9755264655663062,
+        0.9767309875141884,
+        0.9746049661399548,
+        0.960482985729967
+      ],
+      "val_recall": [
+        0.9766407119021134,
+        0.4988876529477197,
+        0.9416017797552837,
+        0.8759733036707452,
+        0.9432703003337041,
+        0.9543937708565072,
+        0.9532814238042269,
+        0.957174638487208,
+        0.9605116796440489,
+        0.9733036707452726
+      ],
+      "val_f1": [
+        0.6826044703595724,
+        0.6656771799628942,
+        0.9156300703082747,
+        0.9311262193319539,
+        0.9520067358967162,
+        0.9525395503746877,
+        0.9642756680731365,
+        0.9668539325842697,
+        0.9675070028011205,
+        0.9668508287292817
+      ],
+      "round_duration_seconds": [
+        2.6635,
+        2.5607,
+        2.5348,
+        2.5576,
+        2.5765,
+        2.5863,
+        2.5499,
+        2.602,
+        2.793,
+        2.7343
+      ],
+      "communication": [
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        }
+      ]
+    },
+    "duration_seconds": 26.17,
+    "communication": {
+      "model_size_bytes": 162440.0,
+      "model_size_kb": 158.63,
+      "downlink_bytes": 1624400.0,
+      "uplink_bytes": 1624400.0,
+      "total_round_bytes": 3248800.0,
+      "total_round_kb": 3172.66,
+      "total_round_mb": 3.0983
+    }
+  },
+  "update_corrupt_trimmed_mean": {
+    "exp_name": "update_corrupt_trimmed_mean",
+    "seed": 42,
+    "attack_type": "model_update_corruption",
+    "aggregator": "trimmed_mean",
+    "malicious_client_ids": [
+      8,
+      9
+    ],
+    "malicious_stats": [
+      {
+        "client_id": 8,
+        "is_malicious": true,
+        "attack_type": "model_update_corruption",
+        "scaling_factor": 1.0
+      },
+      {
+        "client_id": 9,
+        "is_malicious": true,
+        "attack_type": "model_update_corruption",
+        "scaling_factor": 1.0
+      }
+    ],
+    "best_round": 10,
+    "best_val_f1": 0.967027,
+    "test_metrics": {
+      "accuracy": 0.9705756929637527,
+      "precision": 0.9593993325917687,
+      "recall": 0.9636871508379888,
+      "f1_score": 0.9615384615384616,
+      "false_positive_rate": 0.02517241379310345,
+      "false_negative_rate": 0.036312849162011177,
+      "true_negatives": 2827,
+      "false_positives": 73,
+      "false_negatives": 65,
+      "true_positives": 1725,
+      "confusion_matrix": [
+        [
+          2827,
+          73
+        ],
+        [
+          65,
+          1725
+        ]
+      ],
+      "roc_auc": 0.9936399537661335,
+      "test_loss": 0.10098668611221222
+    },
+    "per_attack_eval": {
+      "DoS": {
+        "total": 398,
+        "correct": 391,
+        "errors": 7,
+        "accuracy": 0.9824
+      },
+      "Fuzzy": {
+        "total": 209,
+        "correct": 169,
+        "errors": 40,
+        "accuracy": 0.8086
+      },
+      "Gear": {
+        "total": 591,
+        "correct": 580,
+        "errors": 11,
+        "accuracy": 0.9814
+      },
+      "Normal": {
+        "total": 2900,
+        "correct": 2827,
+        "errors": 73,
+        "accuracy": 0.9748
+      },
+      "RPM": {
+        "total": 592,
+        "correct": 585,
+        "errors": 7,
+        "accuracy": 0.9882
+      }
+    },
+    "history": {
+      "round": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "train_loss": [
+        0.5536647795072682,
+        0.5076954526565804,
+        0.3962782373464663,
+        0.3340229607354292,
+        0.25931620757253915,
+        0.23810690424214917,
+        0.2047131858942059,
+        0.16168144049326053,
+        0.15404162969265467,
+        0.14072495099956467
+      ],
+      "val_loss": [
+        0.683987928136563,
+        0.5330226080394732,
+        0.4295091084889439,
+        0.2611595554692768,
+        0.18597396956309437,
+        0.16969341752750514,
+        0.1227320742931539,
+        0.10576800654384853,
+        0.10335600199605256,
+        0.08786060687317537
+      ],
+      "val_accuracy": [
+        0.4085378868729989,
+        0.8123799359658485,
+        0.8685165421558164,
+        0.9560298826040555,
+        0.9637139807897546,
+        0.959871931696905,
+        0.9726787620064035,
+        0.9707577374599786,
+        0.9699039487726787,
+        0.9745997865528282
+      ],
+      "val_precision": [
+        0.39347492883731117,
+        1.0,
+        0.7596660808435852,
+        0.9704491725768322,
+        0.9699769053117783,
+        0.9413377192982456,
+        0.9832175925925926,
+        0.965266106442577,
+        0.9495387954422138,
+        0.9635560463832137
+      ],
+      "val_recall": [
+        0.9994438264738599,
+        0.5111234705228032,
+        0.9616240266963293,
+        0.9132369299221357,
+        0.9343715239154616,
+        0.9549499443826474,
+        0.9449388209121246,
+        0.9582869855394883,
+        0.9733036707452726,
+        0.9705228031145717
+      ],
+      "val_f1": [
+        0.564650432050275,
+        0.6764814133235186,
+        0.8487972508591065,
+        0.9409742120343839,
+        0.9518413597733711,
+        0.9480949751518498,
+        0.9636982416335791,
+        0.9617638850125593,
+        0.9612743751716561,
+        0.9670268772513162
+      ],
+      "round_duration_seconds": [
+        2.9177,
+        2.678,
+        2.7379,
+        2.5292,
+        2.5099,
+        2.5133,
+        2.4741,
+        2.6799,
+        3.0043,
+        2.6547
+      ],
+      "communication": [
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        },
+        {
+          "model_size_bytes": 162440.0,
+          "model_size_kb": 158.63,
+          "downlink_bytes": 1624400.0,
+          "uplink_bytes": 1624400.0,
+          "total_round_bytes": 3248800.0,
+          "total_round_kb": 3172.66,
+          "total_round_mb": 3.0983
+        }
+      ]
+    },
+    "duration_seconds": 26.71,
+    "communication": {
+      "model_size_bytes": 162440.0,
+      "model_size_kb": 158.63,
+      "downlink_bytes": 1624400.0,
+      "uplink_bytes": 1624400.0,
+      "total_round_bytes": 3248800.0,
+      "total_round_kb": 3172.66,
+      "total_round_mb": 3.0983
+    }
+  }
+}

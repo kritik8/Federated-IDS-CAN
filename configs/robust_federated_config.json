@@ -1,0 +1,68 @@
+{
+  "experiment_name": "robust_federated_learning",
+  "seeds": [42, 43, 44],
+  "primary_seed": 42,
+  "data_regime": {
+    "distribution": "Non-IID_Dirichlet",
+    "alpha": 0.5,
+    "num_clients": 10,
+    "min_samples_per_client": 64
+  },
+  "threat_model": {
+    "num_malicious_clients": 2,
+    "malicious_client_ids": [8, 9],
+    "attacks": {
+      "label_flipping": {
+        "mapping": "0 -> 1, 1 -> 0",
+        "description": "Inverts binary training labels held by designated malicious clients"
+      },
+      "model_update_corruption": {
+        "mode": "delta_sign_reversal",
+        "scaling_factor": 1.0,
+        "description": "Reverses model update delta relative to global broadcast model: theta_corrupted = theta_global - gamma * Delta"
+      }
+    }
+  },
+  "aggregators": {
+    "fedavg": {
+      "type": "sample_weighted_mean",
+      "description": "Standard FedAvg weighted by client sample counts"
+    },
+    "coordinate_median": {
+      "type": "coordinate_wise_median",
+      "description": "Unweighted coordinate-wise median estimator across all participating clients"
+    },
+    "coordinate_trimmed_mean": {
+      "type": "coordinate_wise_trimmed_mean",
+      "trim_ratio": 0.2,
+      "num_trim": 2,
+      "description": "Unweighted coordinate-wise trimmed mean removing m=2 smallest and largest client values"
+    }
+  },
+  "client": {
+    "batch_size": 128,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "optimizer": "Adam",
+    "loss": "CrossEntropyLoss"
+  },
+  "federated": {
+    "rounds": 10,
+    "local_epochs": 1
+  },
+  "model": {
+    "architecture": "CAN1DCNN",
+    "in_channels": 11,
+    "seq_length": 16,
+    "num_classes": 2,
+    "conv_channels": [32, 64, 128],
+    "norm_type": "GroupNorm",
+    "num_groups": 4,
+    "fc_hidden": 64,
+    "dropout": 0.2
+  },
+  "evaluation": {
+    "checkpoint_metric": "val_f1",
+    "device": "cpu"
+  }
+}
