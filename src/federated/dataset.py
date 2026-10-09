@@ -1,6 +1,7 @@
 """
 Dataset Partitioning Module for Federated Learning on Automotive CAN Bus IDS.
-Supports reproducible, leak-free IID partitioning across simulated vehicular clients.
+Supports reproducible, leak-free IID and Dirichlet Non-IID partitioning
+across simulated vehicular clients.
 """
 
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -34,7 +35,7 @@ def partition_iid_stratified(
       over a common automotive traffic baseline, not naturally separated physical vehicles.
       
     Args:
-        y: 1D array of integer labels (shape: [N,]).
+        y: 1D array of integer labels or category names (shape: [N,]).
         num_clients: Number of simulated clients (default 10).
         seed: Random seed for deterministic shuffling (default 42).
         
@@ -67,6 +68,100 @@ def partition_iid_stratified(
     return final_client_indices
 
 
+def partition_dirichlet(
+    categories: np.ndarray,
+    alpha: float,
+    num_clients: int = 10,
+    seed: int = 42,
+    min_samples_per_client: int = 64,
+    max_trials: int = 1000,
+) -> List[np.ndarray]:
+    """
+    Partition sample indices across simulated clients using a category-wise Dirichlet distribution.
+    
+    Methodology:
+      - For each unique category (e.g., Normal, DoS, Fuzzy, Gear, RPM):
+        1. Sample a multinomial allocation vector p ~ Dirichlet(alpha * 1_K).
+        2. Discretize continuous proportions into exact integer counts summing to N_c:
+           counts = floor(p * N_c), and distribute remainder according to largest fractional residuals.
+        3. Slice the deterministically shuffled category indices among the K clients.
+      - Enforce a minimum samples per client constraint (min_samples_per_client) via deterministic
+        rejection sampling across trials to ensure all simulated clients have sufficient data to
+        perform local mini-batch training.
+        
+    Guarantees:
+      1. Mutual Exclusivity: Every training index belongs to exactly one client.
+      2. Completeness: Union of all client indices equals the full dataset (no samples omitted or duplicated).
+      3. Controlled Heterogeneity: Small alpha (e.g., 0.1) creates extreme category and class skew;
+         large alpha (e.g., 1.0) creates moderate heterogeneity.
+      4. Reproducibility: Fully deterministic for a given (alpha, seed, min_samples_per_client).
+      
+    Args:
+        categories: 1D array of categories or labels (e.g., y_types_train or y_train).
+        alpha: Dirichlet concentration parameter (> 0.0). Smaller values produce higher non-IID skew.
+        num_clients: Number of simulated clients (default 10).
+        seed: Random seed for reproducibility.
+        min_samples_per_client: Minimum total samples required per client (default 64).
+        max_trials: Maximum rejection sampling attempts to satisfy min_samples_per_client.
+        
+    Returns:
+        List of 1D numpy integer arrays containing index allocations per client.
+    """
+    if alpha <= 0.0:
+        raise ValueError(f"alpha must be positive (> 0.0), got {alpha}")
+    if num_clients <= 0:
+        raise ValueError(f"num_clients must be positive, got {num_clients}")
+    if min_samples_per_client * num_clients > len(categories):
+        raise ValueError(
+            f"min_samples_per_client ({min_samples_per_client}) * num_clients ({num_clients}) = "
+            f"{min_samples_per_client * num_clients} exceeds total dataset size ({len(categories)})"
+        )
+
+    rng = np.random.RandomState(seed)
+    unique_cats = sorted(np.unique(categories))
+
+    for trial in range(max_trials):
+        client_indices: List[List[int]] = [[] for _ in range(num_clients)]
+
+        for cat in unique_cats:
+            cat_indices = np.where(categories == cat)[0].copy()
+            rng.shuffle(cat_indices)
+            n_c = len(cat_indices)
+
+            # Sample Dirichlet proportions for this category
+            proportions = rng.dirichlet(np.repeat(alpha, num_clients))
+
+            # Discretize integer counts
+            counts = (proportions * n_c).astype(int)
+            remainder = n_c - int(counts.sum())
+            residuals = (proportions * n_c) - counts
+            for top_idx in np.argsort(-residuals)[:remainder]:
+                counts[top_idx] += 1
+
+            start_idx = 0
+            for k in range(num_clients):
+                cnt = counts[k]
+                if cnt > 0:
+                    client_indices[k].extend(cat_indices[start_idx : start_idx + cnt].tolist())
+                start_idx += cnt
+
+        # Check feasibility constraint: each client must have at least min_samples_per_client
+        client_sizes = [len(client_indices[k]) for k in range(num_clients)]
+        if min(client_sizes) >= min_samples_per_client:
+            # Deterministic local shuffle of assigned indices
+            final_indices: List[np.ndarray] = []
+            for k in range(num_clients):
+                arr = np.array(client_indices[k], dtype=np.int64)
+                rng.shuffle(arr)
+                final_indices.append(arr)
+            return final_indices
+
+    raise RuntimeError(
+        f"Failed to find a valid Dirichlet partition with min_samples_per_client={min_samples_per_client} "
+        f"within {max_trials} trials for alpha={alpha}, seed={seed}. Consider reducing min_samples_per_client."
+    )
+
+
 def create_iid_client_datasets(
     X_train: np.ndarray,
     y_train: np.ndarray,
@@ -75,7 +170,7 @@ def create_iid_client_datasets(
     seed: int = 42,
 ) -> Tuple[List[Dict[str, np.ndarray]], Dict[str, Any]]:
     """
-    Partition the centralized training dataset into local datasets for simulated clients.
+    Partition the centralized training dataset into local datasets for simulated clients under IID.
     
     Validation and test datasets are kept strictly centralized and untouched to serve as
     the global benchmark.
@@ -89,11 +184,7 @@ def create_iid_client_datasets(
         
     Returns:
         Tuple of:
-          - client_datasets: List of dicts, each containing:
-              'client_id': int
-              'X': local feature array
-              'y': local binary label array
-              'y_types': local attack type string array (if provided)
+          - client_datasets: List of dicts, each containing 'client_id', 'X', 'y', and optional 'y_types'.
           - summary: Dictionary containing distribution and partition diagnostics.
     """
     client_indices = partition_iid_stratified(y_train, num_clients=num_clients, seed=seed)
@@ -134,6 +225,98 @@ def create_iid_client_datasets(
 
     overall_summary: Dict[str, Any] = {
         "partition_type": "IID_stratified",
+        "num_clients": num_clients,
+        "seed": seed,
+        "total_training_samples": len(y_train),
+        "clients": client_summaries,
+    }
+
+    return client_datasets, overall_summary
+
+
+def create_noniid_client_datasets(
+    X_train: np.ndarray,
+    y_train: np.ndarray,
+    y_types_train: Optional[np.ndarray] = None,
+    alpha: float = 0.5,
+    num_clients: int = 10,
+    seed: int = 42,
+    min_samples_per_client: int = 64,
+) -> Tuple[List[Dict[str, np.ndarray]], Dict[str, Any]]:
+    """
+    Partition the centralized training dataset into local datasets under Dirichlet Non-IID allocation.
+    
+    If y_types_train is provided, partitions across fine-grained attack categories (and Normal traffic),
+    creating attack-type heterogeneity across clients while preserving the binary IDS classification task.
+    If y_types_train is None, partitions across binary labels in y_train.
+    
+    Validation and test datasets are kept strictly centralized and untouched.
+    
+    Args:
+        X_train: Training features array of shape (N, W, F).
+        y_train: Training binary labels array of shape (N,).
+        y_types_train: Optional multi-class attack type strings (shape: [N,]).
+        alpha: Dirichlet concentration parameter (> 0.0).
+        num_clients: Number of simulated vehicular clients.
+        seed: Random seed for reproducibility.
+        min_samples_per_client: Minimum samples required per client.
+        
+    Returns:
+        Tuple of:
+          - client_datasets: List of dicts, each containing 'client_id', 'X', 'y', and optional 'y_types'.
+          - summary: Dictionary containing distribution and partition diagnostics.
+    """
+    # Use attack-type metadata if available, otherwise fall back to binary labels
+    partition_basis = y_types_train if y_types_train is not None else y_train
+
+    client_indices = partition_dirichlet(
+        categories=partition_basis,
+        alpha=alpha,
+        num_clients=num_clients,
+        seed=seed,
+        min_samples_per_client=min_samples_per_client,
+    )
+
+    client_datasets: List[Dict[str, np.ndarray]] = []
+    client_summaries: List[Dict[str, Any]] = []
+
+    for client_id, idx in enumerate(client_indices):
+        X_c = X_train[idx]
+        y_c = y_train[idx]
+        types_c = y_types_train[idx] if y_types_train is not None else None
+
+        client_dict: Dict[str, Any] = {
+            "client_id": client_id,
+            "X": X_c,
+            "y": y_c,
+        }
+        if types_c is not None:
+            client_dict["y_types"] = types_c
+        client_datasets.append(client_dict)
+
+        num_normal = int(np.sum(y_c == 0))
+        num_attack = int(np.sum(y_c == 1))
+        attack_ratio = float(num_attack / len(y_c)) if len(y_c) > 0 else 0.0
+
+        summary_entry: Dict[str, Any] = {
+            "client_id": client_id,
+            "num_samples": len(y_c),
+            "num_normal": num_normal,
+            "num_attack": num_attack,
+            "attack_ratio": round(attack_ratio, 4),
+        }
+        if types_c is not None:
+            unique_types, counts = np.unique(types_c, return_counts=True)
+            summary_entry["attack_types"] = dict(zip(unique_types.tolist(), counts.tolist()))
+
+        client_summaries.append(summary_entry)
+
+    basis_type = "attack_type_categories" if y_types_train is not None else "binary_labels"
+    overall_summary: Dict[str, Any] = {
+        "partition_type": f"Non-IID_Dirichlet_alpha_{alpha}",
+        "partition_basis": basis_type,
+        "alpha": alpha,
+        "min_samples_per_client": min_samples_per_client,
         "num_clients": num_clients,
         "seed": seed,
         "total_training_samples": len(y_train),

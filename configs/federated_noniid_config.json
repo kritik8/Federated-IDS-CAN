@@ -1,0 +1,38 @@
+{
+  "experiment_name": "federated_noniid_fedavg",
+  "seed": 42,
+  "federated": {
+    "num_clients": 10,
+    "aggregation": "FedAvg",
+    "rounds": 10,
+    "local_epochs": 1,
+    "alpha_values": [1.0, 0.5, 0.1],
+    "min_samples_per_client": 64
+  },
+  "client": {
+    "batch_size": 128,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "optimizer": "Adam",
+    "loss": "CrossEntropyLoss"
+  },
+  "model": {
+    "architecture": "CAN1DCNN",
+    "in_channels": 11,
+    "seq_length": 16,
+    "num_classes": 2,
+    "conv_channels": [32, 64, 128],
+    "norm_type": "GroupNorm",
+    "num_groups": 4,
+    "fc_hidden": 64,
+    "dropout": 0.2
+  },
+  "data": {
+    "processed_path": "data/processed/can_ids_processed_dataset.npz",
+    "splits_dir": "data/splits"
+  },
+  "evaluation": {
+    "checkpoint_metric": "val_f1",
+    "device": "cpu"
+  }
+}
