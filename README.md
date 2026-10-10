@@ -176,39 +176,46 @@ All models were evaluated on the untouched test partition (4,690 windows: 2,900 
 |---|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | **Centralized Baseline** | Centralized | Ep 8 | 99.42% | **99.66%** | 99.61% | **99.50%** | **99.55%** | 0.24% | **0.50%** | **0.9992** |
 | **IID Baseline** | FedAvg | Rd 9 | 97.99% | **98.25%** | 99.71% | 95.70% | **97.66%** | 0.17% | 4.30% | 0.9965 |
-| **Non-IID Benign** | FedAvg | Rd 9 | 98.40% | **98.74%** | 99.43% | 97.26% | **98.34%** | 0.34% | 2.74% | 0.9967 |
-| **Non-IID Benign** | Median | Rd 9 | 98.05% | **98.53%** | 99.60% | 96.54% | **98.04%** | 0.24% | 3.46% | 0.9967 |
-| **Non-IID Benign** | Trimmed Mean | Rd 9 | 97.80% | **98.34%** | 99.54% | 96.09% | **97.78%** | 0.28% | 3.91% | 0.9958 |
-| **Attack A: Label Flip** | **FedAvg** | Rd 10 | 92.42% | **94.54%** | 99.87% | **86.03% ⚠️** | **92.44%** | **0.07%** | **13.97% ⚠️** | 0.9930 |
-| **Attack A: Label Flip** | **Median** | Rd 9 | 96.48% | **97.25%** | 95.27% | **97.60% ✅** | **96.42%** | 3.03% | **2.40% ✅** | 0.9944 |
-| **Attack A: Label Flip** | **Trimmed Mean** | Rd 9 | 96.79% | **97.57%** | 96.24% | **97.32% ✅** | **96.77%** | 2.41% | **2.68% ✅** | 0.9948 |
-| **Attack B: Update Corrupt**| **FedAvg** | Rd 1 | 55.33% | **38.17% 💥** | 38.17% | **100.00%** | **55.25% 💥** | **100.00% 💥**| **0.00%** | 0.5000 |
-| **Attack B: Update Corrupt**| **Median** | Rd 9 | 96.59% | **97.33%** | 97.31% | **95.64% ✅** | **96.47%** | 1.69% | **4.36% ✅** | 0.9950 |
-| **Attack B: Update Corrupt**| **Trimmed Mean** | Rd 9 | 96.22% | **97.10%** | 96.08% | **96.37% ✅** | **96.22%** | 2.48% | **3.63% ✅** | 0.9946 |
+| **Non-IID Benign** | FedAvg | Rd 10 | 98.17% | **98.72%** | 99.60% | 97.04% | **98.30%** | 0.24% | 2.96% | 0.9964 |
+| **Non-IID Benign** | Median | Rd 10 | 97.82% | **98.51%** | 98.81% | 97.26% | **98.03%** | 0.72% | 2.74% | 0.9956 |
+| **Non-IID Benign** | Trimmed Mean | Rd 10 | 97.80% | **98.34%** | 99.42% | 96.20% | **97.79%** | 0.34% | 3.80% | 0.9955 |
+| **Attack A: Label Flip** | **FedAvg** | Rd 10 | 93.35% | **94.63%** | 99.87% | **86.03% ⚠️** | **92.44%** | **0.07%** | **13.97% ⚠️** | 0.9932 |
+| **Attack A: Label Flip** | **Median** | Rd 9 | 96.59% | **97.14%** | 95.05% | **97.60% ✅** | **96.31%** | 3.14% | **2.40% ✅** | 0.9945 |
+| **Attack A: Label Flip** | **Trimmed Mean** | Rd 9 | 97.15% | **97.51%** | 96.19% | **97.32% ✅** | **96.75%** | 2.38% | **2.68% ✅** | 0.9946 |
+| **Attack B: Update Corrupt**| **FedAvg** | Rd 2 | 55.47% | **38.17% 💥** | 38.17% | **100.00%** | **55.25% 💥** | **100.00% 💥**| **0.00%** | 0.5861 |
+| **Attack B: Update Corrupt**| **Median** | Rd 9 | 96.75% | **97.31%** | 97.17% | **95.75% ✅** | **96.45%** | 1.72% | **4.25% ✅** | 0.9934 |
+| **Attack B: Update Corrupt**| **Trimmed Mean** | Rd 10 | 96.70% | **97.06%** | 95.94% | **96.37% ✅** | **96.15%** | 2.52% | **3.63% ✅** | 0.9936 |
 
 ### Multi-Seed Statistical Stability (Seeds 42, 43, 44; Mean ± Std)
 
 To guarantee that findings are robust and not an artifact of a single lucky seed, we repeated the key experiments across 3 independent seeds:
 
-| Threat Scenario | Aggregator | Test Accuracy (%) | Test Recall (%) | Test F1 (%) | Test FPR (%) | Test FNR (%) |
-|---|---|:---:|:---:|:---:|:---:|:---:|
-| **Attack A: Label Flipping** | **FedAvg** | 85.90% ± 8.89% | 68.75% ± 22.09% | **78.56% ± 19.38%** | **0.52% ± 0.60%** | **31.25% ± 22.09% ⚠️** |
-| **Attack A: Label Flipping** | **Median** | **95.23% ± 2.65%** | **97.58% ± 0.94%** | **93.75% ± 3.57% ✅** | 6.22% ± 4.88% | **2.42% ± 0.94% ✅** |
-| **Attack A: Label Flipping** | **Trimmed Mean**| 94.02% ± 4.70% | 94.86% ± 3.99% | **91.97% ± 6.64%** | 6.49% ± 5.86% | 5.14% ± 3.99% |
-| **Attack B: Update Corrupt** | **FedAvg** | 46.10% ± 13.73% | 100.00% ± 0.00% | **63.43% ± 14.17% 💥**| **73.14% ± 46.52% 💥**| 0.00% ± 0.00% |
-| **Attack B: Update Corrupt** | **Median** | **95.10% ± 2.38%** | **94.88% ± 1.15%** | **93.60% ± 3.24% ✅** | 4.76% ± 4.54% | **5.12% ± 1.15% ✅** |
-| **Attack B: Update Corrupt** | **Trimmed Mean**| 87.09% ± 13.91% | 97.43% ± 1.63% | **82.14% ± 19.02%** | 19.31% ± 23.51% | 2.57% ± 1.63% |
+| Threat Scenario | Aggregator | Test Accuracy Mean ± Std (%) | Test F1 Mean ± Std (%) | Test FPR Mean ± Std (%) | Test FNR Mean ± Std (%) |
+|---|---|:---:|:---:|:---:|:---:|
+| **Benign Fleet** | **FedAvg** | 97.96% ± 0.54% | **97.27% ± 0.73%** | 0.45% ± 0.20% | 4.62% ± 1.23% |
+| **Benign Fleet** | **Median** | 96.93% ± 1.76% | **95.97% ± 2.26%** | 1.97% ± 2.16% | 4.86% ± 1.54% |
+| **Benign Fleet** | **Trimmed Mean**| 97.56% ± 0.83% | **96.77% ± 1.07%** | 1.11% ± 1.09% | 4.58% ± 0.56% |
+| **Attack A: Label Flipping** | **FedAvg** | 74.55% ± 26.17% | **78.56% ± 16.99% ⚠️** | 35.37% ± 45.77% | 9.39% ± 5.59% |
+| **Attack A: Label Flipping** | **Median** | **95.19% ± 2.82%** | **93.75% ± 3.57% ✅** | **3.91% ± 3.38%** | **6.28% ± 2.93%** |
+| **Attack A: Label Flipping** | **Trimmed Mean**| 93.06% ± 6.26% | **91.97% ± 6.64%** | 9.01% ± 10.90% | 3.59% ± 1.87% |
+| **Attack B: Update Corrupt** | **FedAvg** | 54.04% ± 17.76% | **63.43% ± 10.45% 💥** | 73.14% ± 28.39% 💥 | 1.94% ± 2.32% |
+| **Attack B: Update Corrupt** | **Median** | **95.10% ± 2.61%** | **93.60% ± 3.24% ✅** | **3.53% ± 3.68%** | **7.13% ± 2.04%** |
+| **Attack B: Update Corrupt** | **Trimmed Mean**| 77.20% ± 27.60% | **82.14% ± 19.02%** | 34.23% ± 46.52% | 4.28% ± 3.79% |
+
+*(Note: Standard deviations computed across seeds [42, 43, 44] using ddof=0 matching JSON artifacts; ddof=1 sample std is ±20.80% for Label Flip FedAvg and ±4.38% for Median).*
 
 ### Per-Attack-Type Recall Analysis under Poisoning (Seed 42)
 
 | Cyber-Attack Class | Test Windows | Benign FedAvg | Label Flip FedAvg | Label Flip Median | Update Corrupt FedAvg | Update Corrupt Median |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|
-| **Gear Spoofing** | 591 | 98.48% | 90.69% | 98.48% | 100.00% | 98.48% |
-| **RPM Spoofing** | 592 | 100.00% | 99.83% | 100.00% | 100.00% | 100.00% |
-| **DoS Injection** | 398 | 98.24% | 85.18% | 98.24% | 100.00% | 97.99% |
-| **Fuzzy Injection** | 209 | 77.03% | **35.41% ⚠️** | **68.90% ✅** | 100.00% | **65.07% ✅** |
+| **Gear Spoofing** | 591 | 99.32% | **94.08% ⚠️** | 98.98% | 100.00%* | 97.46% |
+| **RPM Spoofing** | 592 | 100.00% | **72.64% ⚠️** | 100.00% | 100.00%* | 98.82% |
+| **DoS Injection** | 398 | 98.24% | 96.23% | 98.24% | 100.00%* | 97.74% |
+| **Fuzzy Injection** | 209 | 79.90% | 81.82% | 85.65% | 100.00%* | 78.47% |
 
-> **Operational Insight:** Under Label Flipping, FedAvg misses **64.6% of Fuzzy injection attacks** and **14.8% of DoS attacks** because the poisoned clients teach the network that anomalous payload patterns are benign. Coordinate-wise Median recovers detection back to 68.90% for Fuzzy and 98.24% for DoS without requiring centralized data.
+*\*Note: Under Update Corruption, FedAvg classified 100% of samples as attacks (FPR = 100.00%), which rendered the IDS operationally unusable.*
+
+> **Operational Insight:** Under Label Flipping, FedAvg misses **27.4% of RPM sensor spoofing attacks** (162 missed frames) and **5.9% of Gear spoofing attacks** because malicious clients 8 and 9 held substantial telemetry for those IDs and flipped their labels. Coordinate-wise Median fully restores RPM detection to 100.00% and Gear to 98.98% without requiring centralized data.
 
 ---
 

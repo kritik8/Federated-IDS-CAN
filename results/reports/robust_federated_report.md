@@ -164,19 +164,21 @@ Test detection accuracy by cyber-threat class on primary seed 42:
 
 | Scenario / Defense | Normal Traffic (2,900) | DoS Injection (398) | Fuzzy Injection (209) | Gear Spoofing (591) | RPM Spoofing (592) |
 |---|:---:|:---:|:---:|:---:|:---:|
-| **Benign FedAvg (Clean)** | 99.76% | 98.24% | 77.03% | 98.48% | 100.00% |
-| **Benign Median (Clean)** | 99.28% | 98.24% | 77.03% | 98.98% | 100.00% |
-| **Benign Trimmed Mean (Clean)** | 99.66% | 97.49% | 74.64% | 98.48% | 99.83% |
-| **Label Flip + FedAvg** | 99.93% | **73.62% ⚠️** | **45.93% ⚠️** | **88.66% ⚠️** | **95.95% ⚠️** |
-| **Label Flip + Median** | 96.86% | **97.99%** | **79.90%** | **100.00%** | **100.00%** |
-| **Label Flip + Trimmed Mean** | 97.62% | **97.74%** | **78.47%** | **99.66%** | **100.00%** |
-| **Update Corrupt + FedAvg** | **0.00% ⚠️** | 100.00% | 100.00% | 100.00% | 100.00% |
-| **Update Corrupt + Median** | 98.28% | **97.99%** | **78.95%** | **96.62%** | **99.32%** |
-| **Update Corrupt + Trimmed Mean** | 97.48% | **97.99%** | **78.95%** | **97.97%** | **99.32%** |
+| **Benign FedAvg (Clean)** | 99.76% | 98.24% | 79.90% | 99.32% | 100.00% |
+| **Benign Median (Clean)** | 99.28% | 98.24% | 81.82% | 99.32% | 100.00% |
+| **Benign Trimmed Mean (Clean)** | 99.66% | 97.99% | 77.51% | 98.14% | 99.66% |
+| **Label Flip + FedAvg** | 99.93% | **96.23%** | **81.82%** | **94.08% ⚠️** | **72.64% ⚠️** |
+| **Label Flip + Median** | 96.86% | **98.24%** | **85.65%** | **98.98%** | **100.00%** |
+| **Label Flip + Trimmed Mean** | 97.62% | **97.99%** | **85.65%** | **98.48%** | **99.83%** |
+| **Update Corrupt + FedAvg** | **0.00% ⚠️** | 100.00%* | 100.00%* | 100.00%* | 100.00%* |
+| **Update Corrupt + Median** | 98.28% | **97.74%** | **78.47%** | **97.46%** | **98.82%** |
+| **Update Corrupt + Trimmed Mean** | 97.48% | **98.24%** | **80.86%** | **98.14%** | **98.82%** |
+
+*\*Note: Under Update Corruption, FedAvg achieved 100% attack recall only because it suffered complete collapse to predicting "Attack" for 100% of samples (FPR = 100.00%), which rendered the IDS operationally unusable.*
 
 ### Failure Mode Observations:
-- **Label Flipping degrades detection of subtle attacks:** Under FedAvg, Fuzzy detection collapsed from 77.03% to **45.93%**, and DoS collapsed from 98.24% to **73.62%**. Both Median and Trimmed Mean fully restored DoS to $\approx 98\%$ and Fuzzy to $\approx 79\%$.
-- **Update Corruption produces complete False Alarm saturation:** FedAvg classified 0.00% of normal frames correctly (100% false alarms). Both Median (98.28% normal accuracy) and Trimmed Mean (97.48% normal accuracy) prevented this failure mode entirely.
+- **Label Flipping selectively impairs compromised telemetry:** Under FedAvg, RPM detection collapsed from 100.00% to **72.64%** (162 missed RPM spoofing frames) and Gear collapsed to **94.08%** (35 missed frames) because malicious clients 8 and 9 held substantial sensor telemetry (702 and 653 RPM windows respectively) and inverted those labels. Both Median and Trimmed Mean fully restored RPM detection to $\ge 99.8\%$ and Gear to $\ge 98.5\%$.
+- **Update Corruption produces complete False Alarm saturation:** FedAvg classified 0.00% of normal frames correctly (100% false alarms, FPR = 100.00%). Both Median (98.28% normal accuracy) and Trimmed Mean (97.48% normal accuracy) prevented this failure mode entirely.
 
 ---
 
