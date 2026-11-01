@@ -37,6 +37,14 @@
       "trim_ratio": 0.2,
       "num_trim": 2,
       "description": "Unweighted coordinate-wise trimmed mean removing m=2 smallest and largest client values"
+    },
+    "multi_krum": {
+      "type": "distance_based_multi_krum",
+      "num_byzantine": 2,
+      "num_selected": 6,
+      "feasibility_rule": "n >= 2f + 3",
+      "selection_rule": "m = n - f - 2",
+      "description": "Multi-Krum aggregation (Blanchard et al., NeurIPS 2017) selecting m=6 updates with lowest Euclidean distance scores"
     }
   },
   "client": {

@@ -207,11 +207,127 @@ def coordinate_trimmed_mean_aggregate(
     return aggregated_state
 
 
+def multi_krum_aggregate(
+    client_updates: List[Tuple[Dict[str, torch.Tensor], int]],
+    num_byzantine: int = 2,
+    num_selected: Optional[int] = None,
+    return_diagnostics: bool = False,
+) -> Union[Dict[str, torch.Tensor], Tuple[Dict[str, torch.Tensor], Dict[str, Any]]]:
+    """
+    Perform Multi-Krum Byzantine-robust aggregation (Blanchard et al., NeurIPS 2017).
+    
+    Mathematical Formulation:
+      Let n be the total number of participating clients, and f be the maximum number
+      of Byzantine (compromised) clients.
+      
+      Standard theoretical feasibility condition:
+          n >= 2f + 3
+          
+      For each client update i in {1, ..., n}:
+        1. Flatten all continuous floating-point parameters into a 1D vector v_i.
+        2. Compute pairwise squared Euclidean distances: d(i, j) = ||v_i - v_j||_2^2.
+        3. Exclude self-distance (d(i, i) = 0).
+        4. Calculate Krum score s_i by summing distances to its (n - f - 2) nearest neighbors:
+             s_i = sum_{j in N_i} d(i, j), where |N_i| = n - f - 2.
+        5. Rank clients by s_i in ascending order.
+        6. Select the m updates with the lowest Krum scores, where by default:
+             m = n - f - 2
+        7. Aggregate the selected updates using their arithmetic mean:
+             theta_global = (1 / m) * sum_{i in S} theta_i.
+             
+    Args:
+        client_updates: List of tuples (model_state_dict, num_samples).
+        num_byzantine: Assumed upper bound on Byzantine clients f (default 2).
+        num_selected: Number of candidate updates m to select (default n - f - 2).
+        return_diagnostics: If True, returns (aggregated_state, diagnostics_dict).
+        
+    Returns:
+        Aggregated model state dictionary (or tuple with diagnostics).
+    """
+    param_keys = validate_client_updates(client_updates)
+    n = len(client_updates)
+    f = int(num_byzantine)
+
+    if f < 0:
+        raise ValueError(f"num_byzantine must be non-negative, got {f}")
+
+    # Standard Multi-Krum feasibility condition: n >= 2f + 3
+    if n < 2 * f + 3:
+        raise ValueError(
+            f"Multi-Krum requires n >= 2f + 3. Got n={n} clients and f={f} Byzantine budget. "
+            f"Minimum required clients for f={f} is {2 * f + 3}."
+        )
+
+    # Standard Multi-Krum selection parameter: m = n - f - 2
+    if num_selected is not None:
+        m = int(num_selected)
+    else:
+        m = n - f - 2
+
+    if m < 1 or m > n:
+        raise ValueError(f"Number of selected updates m must satisfy 1 <= m <= n ({n}), got {m}")
+
+    reference_state, _ = client_updates[0]
+
+    # 1. Flatten client parameters into 1D vectors
+    flat_vectors = []
+    for client_state, _ in client_updates:
+        flat = torch.cat([
+            client_state[k].detach().flatten().to(dtype=torch.float32, device="cpu")
+            for k in param_keys
+        ])
+        flat_vectors.append(flat)
+
+    stacked_vectors = torch.stack(flat_vectors, dim=0)  # Shape: (n, D)
+
+    # 2. Compute pairwise squared Euclidean distances
+    # Shape: (n, n)
+    dists = torch.cdist(stacked_vectors, stacked_vectors, p=2.0) ** 2
+
+    # 3. Compute Krum score for each client
+    # For client i, distances to all other clients sorted ascending
+    # dists[i, i] is 0.0 (index 0). Indices 1 to (n - f - 2) are the (n - f - 2) nearest other updates.
+    num_neighbors = n - f - 2
+    scores = torch.zeros(n, dtype=torch.float32)
+    for i in range(n):
+        sorted_d, _ = torch.sort(dists[i])
+        # Skip index 0 (self-distance)
+        nearest_d = sorted_d[1 : 1 + num_neighbors]
+        scores[i] = nearest_d.sum()
+
+    # 4. Rank clients by Krum score
+    ranked_indices = torch.argsort(scores).tolist()
+    selected_indices = ranked_indices[:m]
+
+    # 5. Arithmetic mean of the m selected updates
+    aggregated_state: Dict[str, torch.Tensor] = {}
+    for key in param_keys:
+        ref_tensor = reference_state[key]
+        stacked_selected = torch.stack(
+            [client_updates[idx][0][key].to(device=ref_tensor.device) for idx in selected_indices],
+            dim=0,
+        )
+        aggregated_state[key] = stacked_selected.mean(dim=0)
+
+    if return_diagnostics:
+        diagnostics = {
+            "n_clients": n,
+            "f_byzantine": f,
+            "m_selected": m,
+            "krum_scores": [float(s) for s in scores.tolist()],
+            "ranked_client_indices": ranked_indices,
+            "selected_client_indices": selected_indices,
+        }
+        return aggregated_state, diagnostics
+
+    return aggregated_state
+
+
 def aggregate_updates(
     client_updates: List[Tuple[Dict[str, torch.Tensor], int]],
     method: str = "fedavg",
     **kwargs: Any,
-) -> Dict[str, torch.Tensor]:
+) -> Union[Dict[str, torch.Tensor], Tuple[Dict[str, torch.Tensor], Dict[str, Any]]]:
     """
     Dispatcher function for federated model update aggregation.
     
@@ -219,14 +335,15 @@ def aggregate_updates(
       - 'fedavg': Standard sample-weighted FedAvg.
       - 'median' or 'coordinate_median': Unweighted coordinate-wise median.
       - 'trimmed_mean' or 'coordinate_trimmed_mean': Unweighted coordinate-wise trimmed mean.
+      - 'multi_krum' or 'krum': Distance-based Multi-Krum aggregation.
       
     Args:
         client_updates: List of tuples (model_state_dict, num_samples).
         method: Aggregation algorithm name.
-        **kwargs: Additional parameters (e.g. trim_ratio, num_trim).
+        **kwargs: Additional parameters (e.g. trim_ratio, num_trim, num_byzantine, num_selected).
         
     Returns:
-        Aggregated state dictionary.
+        Aggregated state dictionary (or tuple with diagnostics if requested).
     """
     norm_method = method.lower().strip()
 
@@ -238,10 +355,20 @@ def aggregate_updates(
         trim_ratio = kwargs.get("trim_ratio", 0.2)
         num_trim = kwargs.get("num_trim", None)
         return coordinate_trimmed_mean_aggregate(client_updates, trim_ratio=trim_ratio, num_trim=num_trim)
+    elif norm_method in ("multi_krum", "multikrum", "krum"):
+        num_byzantine = kwargs.get("num_byzantine", 2)
+        num_selected = kwargs.get("num_selected", None)
+        return_diag = kwargs.get("return_diagnostics", False)
+        return multi_krum_aggregate(
+            client_updates,
+            num_byzantine=num_byzantine,
+            num_selected=num_selected,
+            return_diagnostics=return_diag,
+        )
     else:
         raise ValueError(
             f"Unknown aggregation method '{method}'. Supported methods: "
-            f"['fedavg', 'coordinate_median', 'coordinate_trimmed_mean']"
+            f"['fedavg', 'coordinate_median', 'coordinate_trimmed_mean', 'multi_krum']"
         )
 
 

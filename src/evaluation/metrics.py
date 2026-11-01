@@ -69,10 +69,13 @@ def compute_classification_metrics(
     }
 
     if y_prob is not None:
-        try:
-            auc = float(roc_auc_score(y_true, y_prob))
-            metrics["roc_auc"] = auc
-        except Exception:
+        if len(np.unique(y_true)) > 1:
+            try:
+                auc = float(roc_auc_score(y_true, y_prob))
+                metrics["roc_auc"] = auc
+            except ValueError:
+                metrics["roc_auc"] = None
+        else:
             metrics["roc_auc"] = None
 
     return metrics

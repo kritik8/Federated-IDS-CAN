@@ -237,11 +237,18 @@ class FederatedServer:
             mean_train_loss = float(np.mean(client_losses))
 
             # 3. Federated Aggregation via configured rule
-            aggregated_params = aggregate_updates(
+            aggregated_output = aggregate_updates(
                 client_updates,
                 method=agg_method,
                 **agg_kwargs,
             )
+            if isinstance(aggregated_output, tuple):
+                aggregated_params, diag = aggregated_output
+                if "aggregation_diagnostics" not in self.history:
+                    self.history["aggregation_diagnostics"] = []
+                self.history["aggregation_diagnostics"].append(diag)
+            else:
+                aggregated_params = aggregated_output
 
             # 4. Update master global model
             self.set_global_parameters(aggregated_params)
