@@ -1,0 +1,54 @@
+{
+  "hardware_environment": {
+    "os": "Windows 11 (10.0.26300)",
+    "cpu": "AMD64 Family 23 Model 160 Stepping 0 (8 logical cores)",
+    "python": "3.12.3",
+    "pytorch": "2.9.1+cpu",
+    "scikit_learn": "1.8.0"
+  },
+  "model_sizes": {
+    "cnn_checkpoint_disk_kb": 165.04,
+    "cnn_trainable_parameters": 40610,
+    "cnn_param_memory_fp32_kb": 158.63,
+    "rf_serialized_disk_kb": 36512.3,
+    "rf_n_estimators": 300,
+    "rf_total_tree_nodes": 466156
+  },
+  "latencies_batch_1_us": {
+    "cnn_model_only": {
+      "mean": 2010.77,
+      "median": 1202.5,
+      "p95": 6734.61,
+      "std": 2134.82
+    },
+    "cnn_end_to_end": {
+      "mean": 664.6,
+      "p95": 941.28
+    },
+    "rf_single_thread_model_only": {
+      "mean": 30440.8,
+      "median": 30647.35,
+      "p95": 44730.69,
+      "std": 8265.72
+    },
+    "rf_multi_thread_model_only": {
+      "mean": 76932.68,
+      "median": 70832.8,
+      "p95": 110652.02,
+      "std": 16330.49
+    },
+    "rf_single_thread_end_to_end": {
+      "mean": 27666.11,
+      "p95": 36664.35
+    }
+  },
+  "calculated_speedups_batch_1": {
+    "cnn_baseline_latency_us": 455.99,
+    "rf_single_thread_model_only_speedup": 66.8,
+    "rf_multi_thread_model_only_speedup": 157.7,
+    "rf_single_thread_exact_ratio": 66.75760433342836,
+    "rf_multi_thread_exact_ratio": 157.6891817803022,
+    "cnn_end_to_end_latency_us": 664.6,
+    "rf_end_to_end_single_thread_speedup": 41.6
+  }
+}

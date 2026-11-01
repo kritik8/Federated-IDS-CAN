@@ -1,0 +1,373 @@
+{
+  "experiment_name": "federated_noniid_alpha_1.0",
+  "alpha": 1.0,
+  "seed": 44,
+  "best_round": 10,
+  "best_validation_f1": 0.976770538243626,
+  "total_training_time_seconds": 28.82,
+  "history": {
+    "round": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "train_loss": [
+      0.5835514581107045,
+      0.46137902373259687,
+      0.3466506336679184,
+      0.3088107781906197,
+      0.3033158723075779,
+      0.2466004624293981,
+      0.2183194720858812,
+      0.18411853520009563,
+      0.16786480714041202,
+      0.1565951396725343
+    ],
+    "val_loss": [
+      0.5881836335458013,
+      0.26419300458601724,
+      0.1459336888828298,
+      0.11370283931636886,
+      0.10075580805953564,
+      0.07588290408683052,
+      0.08109177386461734,
+      0.06594022930845253,
+      0.05741940221432179,
+      0.05530142180458618
+    ],
+    "val_accuracy": [
+      0.6183564567769477,
+      0.9120597652081109,
+      0.9515474919957311,
+      0.9620064034151548,
+      0.968196371398079,
+      0.9788687299893276,
+      0.9739594450373532,
+      0.9801494130202775,
+      0.9822838847385272,
+      0.9824973319103522
+    ],
+    "val_precision": [
+      1.0,
+      0.85,
+      0.9857761286332715,
+      0.9939024390243902,
+      0.9916517590936196,
+      0.9857061177815895,
+      0.997624703087886,
+      0.9953515398024404,
+      0.9948066935949221,
+      0.9953810623556582
+    ],
+    "val_recall": [
+      0.0055617352614015575,
+      0.9360400444938821,
+      0.8865406006674083,
+      0.9065628476084538,
+      0.924916573971079,
+      0.9588431590656284,
+      0.9343715239154616,
+      0.9527252502780867,
+      0.9588431590656284,
+      0.9588431590656284
+    ],
+    "val_f1": [
+      0.011061946902654867,
+      0.8909475913181577,
+      0.9335285505124451,
+      0.9482257126236184,
+      0.9571223021582734,
+      0.9720890893712997,
+      0.9649626651349799,
+      0.9735720375106565,
+      0.9764939110733504,
+      0.976770538243626
+    ],
+    "round_duration_seconds": [
+      3.2771,
+      2.7585,
+      2.9482,
+      2.9791,
+      2.5839,
+      2.8314,
+      2.7792,
+      2.6995,
+      2.6957,
+      3.2604
+    ],
+    "communication": [
+      {
+        "model_size_bytes": 162440.0,
+        "model_size_kb": 158.63,
+        "downlink_bytes": 1624400.0,
+        "uplink_bytes": 1624400.0,
+        "total_round_bytes": 3248800.0,
+        "total_round_kb": 3172.66,
+        "total_round_mb": 3.0983
+      },
+      {
+        "model_size_bytes": 162440.0,
+        "model_size_kb": 158.63,
+        "downlink_bytes": 1624400.0,
+        "uplink_bytes": 1624400.0,
+        "total_round_bytes": 3248800.0,
+        "total_round_kb": 3172.66,
+        "total_round_mb": 3.0983
+      },
+      {
+        "model_size_bytes": 162440.0,
+        "model_size_kb": 158.63,
+        "downlink_bytes": 1624400.0,
+        "uplink_bytes": 1624400.0,
+        "total_round_bytes": 3248800.0,
+        "total_round_kb": 3172.66,
+        "total_round_mb": 3.0983
+      },
+      {
+        "model_size_bytes": 162440.0,
+        "model_size_kb": 158.63,
+        "downlink_bytes": 1624400.0,
+        "uplink_bytes": 1624400.0,
+        "total_round_bytes": 3248800.0,
+        "total_round_kb": 3172.66,
+        "total_round_mb": 3.0983
+      },
+      {
+        "model_size_bytes": 162440.0,
+        "model_size_kb": 158.63,
+        "downlink_bytes": 1624400.0,
+        "uplink_bytes": 1624400.0,
+        "total_round_bytes": 3248800.0,
+        "total_round_kb": 3172.66,
+        "total_round_mb": 3.0983
+      },
+      {
+        "model_size_bytes": 162440.0,
+        "model_size_kb": 158.63,
+        "downlink_bytes": 1624400.0,
+        "uplink_bytes": 1624400.0,
+        "total_round_bytes": 3248800.0,
+        "total_round_kb": 3172.66,
+        "total_round_mb": 3.0983
+      },
+      {
+        "model_size_bytes": 162440.0,
+        "model_size_kb": 158.63,
+        "downlink_bytes": 1624400.0,
+        "uplink_bytes": 1624400.0,
+        "total_round_bytes": 3248800.0,
+        "total_round_kb": 3172.66,
+        "total_round_mb": 3.0983
+      },
+      {
+        "model_size_bytes": 162440.0,
+        "model_size_kb": 158.63,
+        "downlink_bytes": 1624400.0,
+        "uplink_bytes": 1624400.0,
+        "total_round_bytes": 3248800.0,
+        "total_round_kb": 3172.66,
+        "total_round_mb": 3.0983
+      },
+      {
+        "model_size_bytes": 162440.0,
+        "model_size_kb": 158.63,
+        "downlink_bytes": 1624400.0,
+        "uplink_bytes": 1624400.0,
+        "total_round_bytes": 3248800.0,
+        "total_round_kb": 3172.66,
+        "total_round_mb": 3.0983
+      },
+      {
+        "model_size_bytes": 162440.0,
+        "model_size_kb": 158.63,
+        "downlink_bytes": 1624400.0,
+        "uplink_bytes": 1624400.0,
+        "total_round_bytes": 3248800.0,
+        "total_round_kb": 3172.66,
+        "total_round_mb": 3.0983
+      }
+    ]
+  },
+  "client_distribution": [
+    {
+      "client_id": 0,
+      "num_samples": 1248,
+      "num_normal": 897,
+      "num_attack": 351,
+      "attack_ratio": 0.2812,
+      "attack_types": {
+        "DoS": 63,
+        "Fuzzy": 170,
+        "Gear": 1,
+        "Normal": 897,
+        "RPM": 117
+      }
+    },
+    {
+      "client_id": 1,
+      "num_samples": 3639,
+      "num_normal": 2927,
+      "num_attack": 712,
+      "attack_ratio": 0.1957,
+      "attack_types": {
+        "DoS": 191,
+        "Fuzzy": 18,
+        "Gear": 301,
+        "Normal": 2927,
+        "RPM": 202
+      }
+    },
+    {
+      "client_id": 2,
+      "num_samples": 2614,
+      "num_normal": 1981,
+      "num_attack": 633,
+      "attack_ratio": 0.2422,
+      "attack_types": {
+        "DoS": 66,
+        "Fuzzy": 275,
+        "Gear": 51,
+        "Normal": 1981,
+        "RPM": 241
+      }
+    },
+    {
+      "client_id": 3,
+      "num_samples": 1363,
+      "num_normal": 650,
+      "num_attack": 713,
+      "attack_ratio": 0.5231,
+      "attack_types": {
+        "DoS": 291,
+        "Fuzzy": 159,
+        "Gear": 8,
+        "Normal": 650,
+        "RPM": 255
+      }
+    },
+    {
+      "client_id": 4,
+      "num_samples": 1357,
+      "num_normal": 515,
+      "num_attack": 842,
+      "attack_ratio": 0.6205,
+      "attack_types": {
+        "DoS": 22,
+        "Fuzzy": 394,
+        "Gear": 369,
+        "Normal": 515,
+        "RPM": 57
+      }
+    },
+    {
+      "client_id": 5,
+      "num_samples": 3051,
+      "num_normal": 1439,
+      "num_attack": 1612,
+      "attack_ratio": 0.5284,
+      "attack_types": {
+        "DoS": 40,
+        "Fuzzy": 29,
+        "Gear": 1000,
+        "Normal": 1439,
+        "RPM": 543
+      }
+    },
+    {
+      "client_id": 6,
+      "num_samples": 1955,
+      "num_normal": 990,
+      "num_attack": 965,
+      "attack_ratio": 0.4936,
+      "attack_types": {
+        "DoS": 230,
+        "Fuzzy": 35,
+        "Gear": 41,
+        "Normal": 990,
+        "RPM": 659
+      }
+    },
+    {
+      "client_id": 7,
+      "num_samples": 2704,
+      "num_normal": 1000,
+      "num_attack": 1704,
+      "attack_ratio": 0.6302,
+      "attack_types": {
+        "DoS": 705,
+        "Fuzzy": 350,
+        "Gear": 567,
+        "Normal": 1000,
+        "RPM": 82
+      }
+    },
+    {
+      "client_id": 8,
+      "num_samples": 485,
+      "num_normal": 167,
+      "num_attack": 318,
+      "attack_ratio": 0.6557,
+      "attack_types": {
+        "DoS": 79,
+        "Fuzzy": 139,
+        "Gear": 75,
+        "Normal": 167,
+        "RPM": 25
+      }
+    },
+    {
+      "client_id": 9,
+      "num_samples": 3459,
+      "num_normal": 2756,
+      "num_attack": 703,
+      "attack_ratio": 0.2032,
+      "attack_types": {
+        "DoS": 233,
+        "Fuzzy": 21,
+        "Gear": 95,
+        "Normal": 2756,
+        "RPM": 354
+      }
+    }
+  ],
+  "test_metrics": {
+    "accuracy": 0.9750533049040512,
+    "precision": 0.995850622406639,
+    "recall": 0.9385474860335196,
+    "f1_score": 0.9663503019844694,
+    "false_positive_rate": 0.002413793103448276,
+    "false_negative_rate": 0.061452513966480445,
+    "true_negatives": 2893,
+    "false_positives": 7,
+    "false_negatives": 110,
+    "true_positives": 1680,
+    "confusion_matrix": [
+      [
+        2893,
+        7
+      ],
+      [
+        110,
+        1680
+      ]
+    ],
+    "roc_auc": 0.995882103640917,
+    "test_loss": 0.07642569488077275
+  },
+  "communication": {
+    "model_size_bytes": 162440.0,
+    "model_size_kb": 158.63,
+    "downlink_bytes": 1624400.0,
+    "uplink_bytes": 1624400.0,
+    "total_round_bytes": 3248800.0,
+    "total_round_kb": 3172.66,
+    "total_round_mb": 3.0983
+  }
+}

@@ -1,0 +1,13 @@
+Threat Scenario,Aggregator,Test F1 (%),Test Acc (%),FPR (%),FNR (%)
+Benign Clean,FedAvg,97.27 ± 0.90,97.96 ± 0.66,0.45 ± 0.25,4.62 ± 1.51
+Benign Clean,Median,95.97 ± 2.76,96.93 ± 2.15,1.97 ± 2.64,4.86 ± 1.89
+Benign Clean,Trimmed Mean,96.77 ± 1.31,97.56 ± 1.01,1.11 ± 1.33,4.58 ± 0.69
+Benign Clean,Multi-Krum,90.98 ± 9.07,93.91 ± 5.67,0.89 ± 0.17,14.53 ± 14.93
+Attack A (Label Flipping),FedAvg,78.56 ± 20.80,74.55 ± 32.05,35.37 ± 56.05,9.39 ± 6.85
+Attack A (Label Flipping),Median,93.75 ± 4.38,95.19 ± 3.46,3.91 ± 4.14,6.28 ± 3.59
+Attack A (Label Flipping),Trimmed Mean,91.97 ± 8.13,93.06 ± 7.67,9.01 ± 13.35,3.59 ± 2.29
+Attack A (Label Flipping),Multi-Krum,82.23 ± 23.42,77.29 ± 33.90,33.86 ± 57.28,4.66 ± 5.00
+Attack B (Update Corruption),FedAvg,63.43 ± 12.80,54.04 ± 21.75,73.14 ± 34.77,1.94 ± 2.84
+Attack B (Update Corruption),Median,93.60 ± 3.96,95.10 ± 3.20,3.53 ± 4.50,7.13 ± 2.50
+Attack B (Update Corruption),Trimmed Mean,82.14 ± 23.30,77.20 ± 33.81,34.23 ± 56.97,4.28 ± 4.64
+Attack B (Update Corruption),Multi-Krum,82.30 ± 23.47,77.34 ± 33.94,33.69 ± 57.43,4.79 ± 5.21

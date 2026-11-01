@@ -1,0 +1,22 @@
+{
+  "validation_status": "PASSED_ALL_CHECKS",
+  "total_checks_performed": 7,
+  "checks_passed": [
+    "Centralized Baseline multi-seed mean and std verified.",
+    "IID FedAvg Baseline multi-seed results verified.",
+    "Non-IID FedAvg multi-regime multi-seed results verified.",
+    "Robust federated multi-seed statistics (FedAvg, Median, Trimmed Mean) verified.",
+    "Multi-Krum confusion matrices and metric definitions verified.",
+    "Random Forest confusion matrices and zero-FP property verified.",
+    "Master 12-condition aggregator consolidation verified."
+  ],
+  "checks_failed": [],
+  "reconciled_findings": [
+    "Coordinate-wise Median reports distinct metrics for Benign Clean (95.97% F1) vs Attack A (93.75% F1) and Attack B (93.60% F1).",
+    "FedAvg under Attack B multi-seed mean is 63.43% F1 and 54.04% Acc; Seed 42 fails via all-positive collapse (38.17% Acc, 100% FPR).",
+    "Multi-Krum failure under Seed 44 is driven by Non-IID class skew (pruning honest Client 3 with 37.5% normal data as an outlier).",
+    "Canonical 1D-CNN baseline established at 99.65% Acc, 99.54% F1 (10 epochs, 28.91s); conflicting 97.75% profile resolved as erroneous chat text.",
+    "Latency benchmarks qualified for desktop CPU environment (AMD64 8-core, batch=1); unverified ECU real-time claims removed.",
+    "Single-vehicle Kia Soul CAN dataset origin and 10 simulated virtual partitions explicitly disclosed across all reports and figures."
+  ]
+}
