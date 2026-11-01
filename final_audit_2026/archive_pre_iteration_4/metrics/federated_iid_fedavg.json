@@ -1,0 +1,201 @@
+{
+  "experiment_name": "federated_iid_fedavg",
+  "seed": 42,
+  "federated_setup": {
+    "num_clients": 10,
+    "distribution": "IID_stratified",
+    "aggregation": "FedAvg",
+    "rounds": 10,
+    "local_epochs": 1,
+    "batch_size": 128,
+    "learning_rate": 0.001
+  },
+  "model_parameters": {
+    "trainable_parameters": 40610,
+    "total_parameters": 40610
+  },
+  "communication": {
+    "model_size_bytes": 162440.0,
+    "model_size_kb": 158.63,
+    "downlink_bytes": 1624400.0,
+    "uplink_bytes": 1624400.0,
+    "total_round_bytes": 3248800.0,
+    "total_round_kb": 3172.66,
+    "total_round_mb": 3.0983
+  },
+  "best_round": 9,
+  "best_validation_f1": 0.979904,
+  "total_training_time_seconds": 35.45,
+  "client_distribution": [
+    {
+      "client_id": 0,
+      "num_samples": 2189,
+      "num_normal": 1333,
+      "num_attack": 856,
+      "attack_ratio": 0.391,
+      "attack_types": {
+        "DoS": 171,
+        "Fuzzy": 167,
+        "Gear": 264,
+        "Normal": 1333,
+        "RPM": 254
+      }
+    },
+    {
+      "client_id": 1,
+      "num_samples": 2189,
+      "num_normal": 1333,
+      "num_attack": 856,
+      "attack_ratio": 0.391,
+      "attack_types": {
+        "DoS": 207,
+        "Fuzzy": 176,
+        "Gear": 238,
+        "Normal": 1333,
+        "RPM": 235
+      }
+    },
+    {
+      "client_id": 2,
+      "num_samples": 2188,
+      "num_normal": 1332,
+      "num_attack": 856,
+      "attack_ratio": 0.3912,
+      "attack_types": {
+        "DoS": 181,
+        "Fuzzy": 149,
+        "Gear": 266,
+        "Normal": 1332,
+        "RPM": 260
+      }
+    },
+    {
+      "client_id": 3,
+      "num_samples": 2187,
+      "num_normal": 1332,
+      "num_attack": 855,
+      "attack_ratio": 0.3909,
+      "attack_types": {
+        "DoS": 168,
+        "Fuzzy": 150,
+        "Gear": 273,
+        "Normal": 1332,
+        "RPM": 264
+      }
+    },
+    {
+      "client_id": 4,
+      "num_samples": 2187,
+      "num_normal": 1332,
+      "num_attack": 855,
+      "attack_ratio": 0.3909,
+      "attack_types": {
+        "DoS": 194,
+        "Fuzzy": 161,
+        "Gear": 252,
+        "Normal": 1332,
+        "RPM": 248
+      }
+    },
+    {
+      "client_id": 5,
+      "num_samples": 2187,
+      "num_normal": 1332,
+      "num_attack": 855,
+      "attack_ratio": 0.3909,
+      "attack_types": {
+        "DoS": 212,
+        "Fuzzy": 146,
+        "Gear": 222,
+        "Normal": 1332,
+        "RPM": 275
+      }
+    },
+    {
+      "client_id": 6,
+      "num_samples": 2187,
+      "num_normal": 1332,
+      "num_attack": 855,
+      "attack_ratio": 0.3909,
+      "attack_types": {
+        "DoS": 205,
+        "Fuzzy": 164,
+        "Gear": 244,
+        "Normal": 1332,
+        "RPM": 242
+      }
+    },
+    {
+      "client_id": 7,
+      "num_samples": 2187,
+      "num_normal": 1332,
+      "num_attack": 855,
+      "attack_ratio": 0.3909,
+      "attack_types": {
+        "DoS": 198,
+        "Fuzzy": 155,
+        "Gear": 255,
+        "Normal": 1332,
+        "RPM": 247
+      }
+    },
+    {
+      "client_id": 8,
+      "num_samples": 2187,
+      "num_normal": 1332,
+      "num_attack": 855,
+      "attack_ratio": 0.3909,
+      "attack_types": {
+        "DoS": 185,
+        "Fuzzy": 160,
+        "Gear": 243,
+        "Normal": 1332,
+        "RPM": 267
+      }
+    },
+    {
+      "client_id": 9,
+      "num_samples": 2187,
+      "num_normal": 1332,
+      "num_attack": 855,
+      "attack_ratio": 0.3909,
+      "attack_types": {
+        "DoS": 199,
+        "Fuzzy": 162,
+        "Gear": 251,
+        "Normal": 1332,
+        "RPM": 243
+      }
+    }
+  ],
+  "test_metrics": {
+    "accuracy": 0.9825159914712154,
+    "precision": 0.9970896391152503,
+    "recall": 0.9569832402234637,
+    "f1_score": 0.9766248574686431,
+    "false_positive_rate": 0.0017241379310344827,
+    "false_negative_rate": 0.043016759776536316,
+    "true_negatives": 2895,
+    "false_positives": 5,
+    "false_negatives": 77,
+    "true_positives": 1713,
+    "confusion_matrix": [
+      [
+        2895,
+        5
+      ],
+      [
+        77,
+        1713
+      ]
+    ],
+    "roc_auc": 0.9964869967251011,
+    "test_loss": 0.058279781562210656
+  },
+  "centralized_comparison": {
+    "centralized_accuracy": 0.9965884861407249,
+    "centralized_f1": 0.9955282280603689,
+    "federated_accuracy": 0.9825159914712154,
+    "federated_f1": 0.9766248574686431
+  }
+}

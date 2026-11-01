@@ -1,0 +1,55 @@
+{
+  "model": "1D-CNN Baseline (GroupNorm)",
+  "architecture": "CAN1DCNN",
+  "normalization": "GroupNorm (G=4)",
+  "parameters": {
+    "trainable_parameters": 40610,
+    "total_parameters": 40610
+  },
+  "best_epoch": 8,
+  "best_validation_f1": 0.994162,
+  "latency": {
+    "single_sample_latency_us": 455.9919998670618,
+    "single_sample_median_us": 421.0500046610832,
+    "single_sample_p95_us": 590.5949990847147,
+    "batch_size": 128,
+    "batch_latency_ms": 3.4617400010271617,
+    "std_batch_latency_ms": 0.31311975337941067,
+    "amortized_batch_latency_us": 27.0448437580247,
+    "throughput_samples_sec": 36975.62496375234,
+    "mean_batch_latency_ms": 3.4617400010271617,
+    "mean_per_sample_latency_us": 27.0448437580247
+  },
+  "training_time_seconds": 27.93,
+  "test_metrics": {
+    "accuracy": 0.9965884861407249,
+    "precision": 0.9960850111856824,
+    "recall": 0.9949720670391061,
+    "f1_score": 0.9955282280603689,
+    "false_positive_rate": 0.002413793103448276,
+    "false_negative_rate": 0.005027932960893855,
+    "true_negatives": 2893,
+    "false_positives": 7,
+    "false_negatives": 9,
+    "true_positives": 1781,
+    "confusion_matrix": [
+      [
+        2893,
+        7
+      ],
+      [
+        9,
+        1781
+      ]
+    ],
+    "roc_auc": 0.999236370641495
+  },
+  "reproducibility": {
+    "seed": 42,
+    "device": "cpu",
+    "epochs": 10,
+    "batch_size": 128,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001
+  }
+}
