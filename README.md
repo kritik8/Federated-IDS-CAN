@@ -1,350 +1,273 @@
+# Robust Federated Learning-Based Intrusion Detection for Heterogeneous Vehicular CAN Networks
+
 <div align="center">
-
-# Federated-IDS-CAN
-
-**Robust Federated Learning-Based Intrusion Detection for Heterogeneous Vehicular CAN Networks**
 
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-EE4C2C?style=flat-square&logo=pytorch&logoColor=white)](https://pytorch.org/)
+[![Scikit-Learn](https://img.shields.io/badge/scikit--learn-1.8+-F7931E?style=flat-square&logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
+[![Tests](https://img.shields.io/badge/Tests-53%20Passed%20(0%20Warnings)-brightgreen?style=flat-square)](tests/)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)
-[![Status](https://img.shields.io/badge/Status-Phase_3_Robust_Aggregation_Complete-brightgreen?style=flat-square)]()
+[![Status](https://img.shields.io/badge/Implementation-Frozen%20(Nov%201%2C%202026)-success?style=flat-square)](final_audit_2026/FINAL_IMPLEMENTATION_FREEZE_REPORT.md)
 
-<p align="center">
-  A research-grade, scientifically reproducible intrusion detection system (IDS) benchmark evaluating decentralized Federated Learning under fleet heterogeneity (Non-IID traffic) and adversarial Byzantine client attacks on Controller Area Network (CAN) security.
-</p>
+**A rigorous, reproducible research framework evaluating decentralized Federated Learning under fleet heterogeneity (Non-IID traffic) and adversarial Byzantine client poisoning for in-vehicle Controller Area Network (CAN) security.**
 
-[Project](#-project) • [Why It Matters](#-why-this-research-matters) • [Methodology](#-current-methodology) • [Dataset](#-current-dataset) • [Baseline Architecture](#-current-baseline-model) • [Phase 2A IID Baseline](#-phase-2a-iid-federated-learning-baseline) • [Phase 2B Non-IID Experiments](#-phase-2b-non-iid-heterogeneity-experiments) • [Phase 3 Robust Aggregation](#-phase-3-robust-federated-learning-under-adversarial-attacks) • [Results & Comparison](#-results--centralized-vs-iid-vs-non-iid-vs-robust-fl) • [Methodological Decisions](#-important-methodological-decisions) • [Limitations](#-current-limitations) • [Next Steps](#-next-step)
+[Overview](#-overview) • [System Architecture](#-system-architecture) • [Authoritative Results](#-authoritative-master-experimental-results) • [Key Scientific Insights](#-key-scientific-insights) • [Threat Models & Defenses](#-threat-models--defense-mechanisms) • [Scope & Guardrails](#-scientific-guardrails--limitations) • [Quickstart & Reproducibility](#-quickstart--reproducibility) • [Repository Structure](#-repository-structure)
 
 </div>
 
 ---
 
-## 🚀 Project
+## 📌 Overview
 
-**What are we building?**
+Modern passenger vehicles integrate over 70 Electronic Control Units (ECUs) exchanging sensor telemetry and actuation commands across the internal **Controller Area Network (CAN)** bus. Because the classical CAN protocol lacks native encryption, message authentication, or sender identity verification, a compromised gateway (e.g., via infotainment, cellular telematics, or OBD-II diagnostics) can inject arbitrary arbitration IDs and malicious payloads with high bus priority.
 
-We are developing a Byzantine-robust **Federated Learning (FL) Intrusion Detection System** for modern connected vehicles. 
+### Why Federated Learning for CAN IDS?
+1. **Bandwidth Preservation:** Streaming millions of high-frequency raw CAN frames from connected vehicle fleets to centralized cloud repositories introduces extreme communication and storage bottlenecks.
+2. **Confidentiality by Data Locality:** Federated Learning (FL) coordinates distributed model training across edge clients (vehicles or subsystem gateways) by exchanging local parameter updates ($\theta_k$) rather than transmitting raw packet streams.
+3. **The Core Vulnerability:** In decentralized fleets, standard Federated Averaging (`FedAvg`) is fundamentally fragile against two prevalent vehicular challenges:
+   - **Fleet Traffic Heterogeneity (Non-IID Drift):** Varying vehicle models, driving behaviors, and localized cyber-attacks cause severe client drift, destabilizing global model convergence.
+   - **Byzantine Adversarial Poisoning:** Compromised or rogue vehicles participating in collaborative learning can submit crafted or inverted model updates to blind the global IDS or trigger denial-of-service false alarms.
 
-In modern automobiles, dozens of Electronic Control Units (ECUs) communicate over the internal **Controller Area Network (CAN)** bus. Because CAN has no built-in encryption or authentication, attackers who breach infotainment, telematics, or OBD-II ports can inject malicious messages directly into safety-critical networks.
-
-Instead of pooling gigabytes of raw CAN telemetry into a centralized cloud server, our framework enables individual vehicles (or ECUs) to train local deep-learning intrusion detectors collaboratively on their own traffic traces, sharing only model weight updates.
-
-> **Important Note on Privacy:** Local decentralized training ensures raw CAN data remains on each client. However, parameter sharing alone does *not* constitute a formal cryptographic or differential privacy guarantee against gradient leakage or model inversion attacks.
-
----
-
-## 🛡️ Why This Research Matters
-
-1. **Zero Native CAN Security:** CAN bus broadcasts all messages in plaintext. Any compromised node can spoof packets with high arbitration priority.
-2. **Safety-Critical Deadlines:** In-vehicle intrusions must be detected in sub-millisecond timeframes to prevent catastrophic physical manipulation.
-3. **Bandwidth Constraints:** Streaming raw CAN traffic from millions of connected vehicles causes telemetry bottlenecks.
-4. **Fleet Heterogeneity (Non-IID Traffic):** Real vehicles experience different driving environments, routes, and threat profiles. This non-identical data distribution (Non-IID) induces **client drift**, causing standard distributed algorithms (like vanilla FedAvg) to degrade.
-5. **Adversarial Threat Vectors:** In open vehicular fleets, compromised vehicles can launch Byzantine poisoning attacks to sabotage global detection.
+This repository provides an end-to-end, scientifically validated benchmark that evaluates lightweight edge deep learning architectures, quantifies FedAvg degradation under Dirichlet data skew ($\alpha \in \{1.0, 0.5, 0.1\}$), and benchmarks Byzantine-robust aggregation mechanisms (**Coordinate-wise Median**, **Coordinate-wise Trimmed Mean**, and distance-based **Multi-Krum**) against data poisoning (Label Flipping) and model poisoning (Sign Reversal).
 
 ---
 
-## 🔬 Current Methodology
+## 🏗️ System Architecture
 
-The overall research pipeline and its current execution status:
+The pipeline processes raw CAN packet captures into sliding temporal windows, trains edge-optimized neural classifiers with Group Normalization, simulates heterogeneous client partitions, and aggregates updates under Byzantine threat models:
 
 ```text
-CAN raw data
-  └──► [DONE] Preprocessing & Variable DLC parsing
-         └──► [DONE] 11-Dimensional Feature extraction
-                └──► [DONE] Non-overlapping sliding windowing (W=16, S=16)
-                       └──► [DONE] Leak-free chronological train/val/test splitting
-                              └──► [DONE] Centralized 1D-CNN baseline (GroupNorm)
-                                     ├──► [DONE] Phase 2A: 10-Client IID FedAvg baseline
-                                     ├──► [DONE] Phase 2B: Non-IID Dirichlet client partitioning (alpha in {1.0, 0.5, 0.1})
-                                     ├──► [DONE] Phase 3: Malicious clients & Robust Aggregation (Label Flipping, Delta Sign Reversal, Median, Trimmed Mean)
-                                     ├──► [NEXT] Phase 3B: Advanced Byzantine attacks & defense (Krum, FoolsGold, adaptive backdoors)
-                                     ├──► [PLANNED] Phase 3C: Heterogeneity-aware FL (FedProx, SCAFFOLD)
-                                     └──► [PLANNED] Phase 4: Hardware trace-replay evaluation testbed
+[Raw CAN Telemetry Stream] (HCRL Kia Soul: Normal, DoS, Fuzzy, Gear, RPM)
+       │
+       ▼
+[Feature Extraction & Windowing]
+       ├── Dynamic Variable DLC Parsing (Handles DLC < 8 without byte corruption)
+       ├── 11-Dimensional Feature Vector: Normalized CAN ID, DLC, 8 Data Bytes, Domain-Scaled Δt
+       └── Non-Overlapping Sliding Windows (Window Size W=16, Stride S=16)
+       │
+       ▼
+[Chronological Scenario Split] (Strictly per scenario: 70% Train, 15% Val, 15% Test)
+       │
+       ▼
+[Edge-Optimized Neural Model: CAN1DCNN]
+       ├── 3 Conv1D Blocks + GroupNorm (G=4) + ReLU + MaxPool (40,610 FP32 Parameters, ~165 KB)
+       └── Replaces BatchNorm1d to eliminate running mean/variance divergence under Non-IID data
+       │
+       ▼
+[Federated Fleet Simulation] (10 Virtual Clients via Dirichlet Allocation: α ∈ {1.0, 0.5, 0.1})
+       │
+       ├── Honest Clients (k ∈ {0, 1, ..., 7}): Local SGD on Private Partitions
+       └── Byzantine Clients (k ∈ {8, 9}, 20% by count, 25%-40% by training volume):
+             ├── Attack A (Data Poisoning): Label Flipping (y ↦ 1 - y)
+             └── Attack B (Model Poisoning): Update Sign Reversal (Δk' = -γ Δk, γ = 1.0)
+       │
+       ▼
+[Central Aggregation Server]
+       ├── Vanilla Baseline: Sample-Weighted Federated Averaging (FedAvg)
+       ├── Coordinate-wise Median: θj = median({θk,j})
+       ├── Coordinate-wise Trimmed Mean: θj = trimmed_mean({θk,j}, m=2)
+       └── Distance-Based Multi-Krum: Candidate selection via Euclidean distance neighborhood scores
 ```
 
-| Phase | Milestone | Status | Description |
-|---|---|:---:|---|
-| **Phase 1** | Centralized Baseline Hardening | **DONE** | Fixed variable DLC CSV parsing, converted to GroupNorm, eliminated inter-arrival leakage, bounded $\Delta t$ into $[0, 1]$, enabled best validation checkpointing, added edge latency profiling. |
-| **Phase 1** | Centralized Notebook Execution | **DONE** | Executed and verified `notebooks/01_dataset_analysis.ipynb`, `02_preprocessing.ipynb`, and `03_baseline_ids.ipynb`. |
-| **Phase 2A** | IID Federated Baseline | **DONE** | Simulated 10 vehicular clients under deterministic stratified IID partitioning, implemented sample-weighted FedAvg, achieved **98.25% Accuracy** and **97.66% F1**. Executed `notebooks/04_federated_iid.ipynb`. |
-| **Phase 2B** | **Non-IID Heterogeneity Benchmark** | **DONE** | Partitioned training pool across 10 clients using Dirichlet distributions ($\alpha \in \{1.0, 0.5, 0.1\}$) based on attack categories. Quantified client drift and cyber-threat vulnerability under FedAvg. Executed `notebooks/05_federated_noniid.ipynb`. |
-| **Phase 3** | **Byzantine Attacks & Robust Aggregation** | **DONE** | Formulated 2 threat models (Label Flipping $y \mapsto 1-y$, Model-Update Delta Sign Reversal $\Delta_k' = -\gamma \Delta_k$). Implemented Coordinate-wise Median and Trimmed Mean ($m=2$). Demonstrated FedAvg vulnerability and robust recovery across 9 experiments and multi-seed evaluations. Executed `notebooks/06_robust_federated_learning.ipynb`. |
-| **Phase 3B** | Advanced Defense & Backdoors | **NEXT** | Evaluate distance-based defense (Multi-Krum), cosine-similarity defense (FoolsGold), and stealthy targeted backdoor injection. |
-| **Phase 3C** | Heterogeneity-Aware FL | **PLANNED** | Implement and evaluate FedProx and SCAFFOLD to combat client drift under extreme Non-IID. |
-| **Phase 4** | Trace Replay & Paper Benchmarks | **PLANNED** | Hardware trace-replay evaluation testbed on embedded edge platforms. |
+A publication-ready, 300-DPI architectural diagram is available at [`results/figures/system_architecture.png`](results/figures/system_architecture.png).
 
 ---
 
-## 💾 Current Dataset
+## 📊 Authoritative Master Experimental Results
 
-We evaluate our pipeline on the widely recognized **HCRL Car-Hacking Dataset** recorded by the Korea University Hacking and Countermeasure Research Lab from a commercial Kia Soul vehicle:
+All reported metrics are computed on the held-out test partition ($N=4,690$ windows: 2,900 Normal, 1,790 Attack) across **Seeds 42, 43, and 44** using sample mean and unbiased sample standard deviation ($ddof=1$). Raw results are compiled in [`results/metrics/final_verified_results.csv`](results/metrics/final_verified_results.csv).
 
-- **Normal Run (`normal_run_data.txt`):** Ambient driving traffic without cyber-attacks.
-- **DoS Attack (`DoS_dataset.csv`):** Injected dominant `0x000` messages at 0.3 ms frequency to overwhelm bus arbitration.
-- **Fuzzy Attack (`Fuzzy_dataset.csv`):** Injected random arbitration IDs and randomized payloads across the bus.
-- **RPM Spoofing (`RPM_dataset.csv`):** Target injection spoofing engine RPM sensor readings (`CAN ID: 0x0316`).
-- **Gear Spoofing (`gear_dataset.csv`):** Target injection spoofing automatic transmission gear status (`CAN ID: 0x043F`).
-
-### Processed Dataset Volume
-The pipeline subsamples the first **100,000 frames** from each of the 5 scenarios (500,000 frames total). Frames are grouped into non-overlapping contiguous 16-frame windows ($W=16, S=16$) and split chronologically per scenario:
-
-- **Train Set (70%):** 21,875 windows (8,553 Attack, 13,322 Normal)
-- **Validation Set (15%):** 4,685 windows (1,798 Attack, 2,887 Normal)
-- **Test Set (15%):** 4,690 windows (1,790 Attack, 2,900 Normal)
-- **Total Windows:** 31,250 windows
+| Category | Method / Model | Threat Scenario | Data Skew | Test F1 (%) | Test Acc (%) | Precision (%) | Recall (%) | FPR (%) | FNR (%) |
+|---|---|---|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Centralized Baseline** | CAN1DCNN (GroupNorm) | Clean Supervised | Centralized | **99.54 ± 0.13** | **99.65 ± 0.10** | 99.65 ± 0.12 | **99.44 ± 0.15** | 0.22 ± 0.07 | **0.56 ± 0.15** |
+| **Centralized Baseline** | Random Forest (300 Trees) | Clean Supervised | Centralized | 99.31 ± 0.08 | 99.47 ± 0.06 | **100.00 ± 0.00** | 98.62 ± 0.16 | **0.00 ± 0.00** | 1.38 ± 0.16 |
+| **Federated IID** | FedAvg | Benign Clean | IID Uniform | 96.94 ± 1.19 | 97.72 ± 0.87 | 99.05 ± 0.57 | 94.93 ± 2.04 | 0.56 ± 0.34 | 5.07 ± 2.04 |
+| **Federated Non-IID** | FedAvg | Benign Clean | Dirichlet $\alpha = 1.0$ | 97.57 ± 0.81 | 98.19 ± 0.59 | 99.54 ± 0.32 | 95.70 ± 1.64 | 0.28 ± 0.19 | 4.30 ± 1.64 |
+| **Federated Non-IID** | FedAvg | Benign Clean | Dirichlet $\alpha = 0.5$ | 97.41 ± 0.50 | 98.06 ± 0.37 | 99.37 ± 0.72 | 95.53 ± 0.92 | 0.38 ± 0.43 | 4.47 ± 0.92 |
+| **Federated Non-IID** | FedAvg | Benign Clean | Dirichlet $\alpha = 0.1$ | **69.16 ± 17.86** | **78.71 ± 12.20** | 84.41 ± 24.55 | 65.18 ± 24.67 | 12.94 ± 21.35 | 34.82 ± 24.67 |
+| **Robust Federated** | FedAvg | Benign Clean | Dirichlet $\alpha = 0.5$ | 97.27 ± 0.90 | 97.96 ± 0.66 | N/A | N/A | 0.45 ± 0.25 | 4.62 ± 1.51 |
+| **Robust Federated** | Coordinate-wise Median | Benign Clean | Dirichlet $\alpha = 0.5$ | 95.97 ± 2.76 | 96.93 ± 2.15 | N/A | N/A | 1.97 ± 2.64 | 4.86 ± 1.89 |
+| **Robust Federated** | Trimmed Mean ($m=2$) | Benign Clean | Dirichlet $\alpha = 0.5$ | 96.77 ± 1.31 | 97.56 ± 1.02 | N/A | N/A | 1.11 ± 1.34 | 4.58 ± 0.69 |
+| **Robust Federated** | Multi-Krum ($m=6, f=2$) | Benign Clean | Dirichlet $\alpha = 0.5$ | 90.98 ± 9.07 | 93.91 ± 5.67 | 98.54 ± 0.32 | 85.47 ± 14.93 | 0.89 ± 0.17 | 14.53 ± 14.93 |
+| **Robust Federated** | FedAvg | Attack A (Label Flip) | Dirichlet $\alpha = 0.5$ | 78.56 ± 20.80 | 74.55 ± 32.05 | N/A | N/A | 35.37 ± 56.06 | 9.39 ± 6.85 |
+| **Robust Federated** | Coordinate-wise Median | Attack A (Label Flip) | Dirichlet $\alpha = 0.5$ | **93.75 ± 4.38** | **95.19 ± 3.45** | N/A | N/A | **3.91 ± 4.14** | **6.28 ± 3.59** |
+| **Robust Federated** | Trimmed Mean ($m=2$) | Attack A (Label Flip) | Dirichlet $\alpha = 0.5$ | 91.97 ± 8.13 | 93.06 ± 7.67 | N/A | N/A | 9.01 ± 13.35 | 3.59 ± 2.29 |
+| **Robust Federated** | Multi-Krum ($m=6, f=2$) | Attack A (Label Flip) | Dirichlet $\alpha = 0.5$ | 82.23 ± 23.42 | 77.29 ± 33.90 | 77.92 ± 38.65 | 95.34 ± 5.00 | 33.86 ± 57.28 | 4.66 ± 5.00 |
+| **Robust Federated** | FedAvg | Attack B (Sign Reversal)| Dirichlet $\alpha = 0.5$ | 63.43 ± 12.80 | 54.04 ± 21.75 | N/A | N/A | 73.14 ± 34.77 | 1.94 ± 2.84 |
+| **Robust Federated** | Coordinate-wise Median | Attack B (Sign Reversal)| Dirichlet $\alpha = 0.5$ | **93.60 ± 3.96** | **95.10 ± 3.20** | N/A | N/A | **3.53 ± 4.51** | **7.13 ± 2.50** |
+| **Robust Federated** | Trimmed Mean ($m=2$) | Attack B (Sign Reversal)| Dirichlet $\alpha = 0.5$ | 82.14 ± 23.30 | 77.20 ± 33.80 | N/A | N/A | 34.23 ± 56.97 | 4.28 ± 4.64 |
+| **Robust Federated** | Multi-Krum ($m=6, f=2$) | Attack B (Sign Reversal)| Dirichlet $\alpha = 0.5$ | 82.30 ± 23.47 | 77.34 ± 33.94 | 78.07 ± 38.61 | 95.21 ± 5.21 | 33.69 ± 57.43 | 4.79 ± 5.21 |
 
 ---
 
-## 🧠 Current Baseline Model
+## 🔍 Key Scientific Insights
 
-We use a lightweight **1D Convolutional Neural Network (`CAN1DCNN`)** designed specifically for edge vehicular ECUs:
+### 1. Robust Defense Superiority: Coordinate-wise Median vs. Distance-Based Multi-Krum
+- **Coordinate-wise Median** demonstrates the highest resilience across both adversarial threat vectors, achieving **93.75% F1** under Attack A (Label Flipping) and **93.60% F1** under Attack B (Sign Reversal). Because it computes the median independently across every scalar weight coordinate, it is naturally immune to extreme coordinate perturbations and tolerates up to $f < K/2$ arbitrary Byzantine clients.
+- **Multi-Krum Vulnerability Under Fleet Skew:** Although classical Byzantine theory guarantees Multi-Krum convergence under IID assumptions, in heterogeneous vehicular networks (Dirichlet $\alpha=0.5$), Multi-Krum degrades to **$82.23\%-82.30\%$ F1**. Forensic inspection revealed that Multi-Krum's failure is driven by **geometric pruning of honest minority clients**: honest clients observing specialized attack or normal traffic naturally produce parameter updates distant from the majority cluster. Multi-Krum misidentifies this statistical heterogeneity as malicious behavior, discarding legitimate updates while admitting clustered majority updates.
 
+### 2. Client Drift Under Extreme Non-IID Traffic ($\alpha = 0.1$)
+- Under moderate Dirichlet skew ($\alpha = 1.0$ and $\alpha = 0.5$), FedAvg maintains high detection capability ($97.57\%$ and $97.41\%$ F1).
+- Under extreme class skew ($\alpha = 0.1$), FedAvg collapses to **$69.16\% \pm 17.86\%$ F1** ($78.71\% \pm 12.20\%$ Accuracy). Forensic analysis of per-seed runs demonstrates the physical reality of vehicular client drift:
+  - **Seed 43:** Severe label starvation induces classifier bias; the model achieves $58.60\%$ F1 with an extreme **63.24% False Negative Rate**, missing nearly two-thirds of safety-critical intrusions.
+  - **Seed 44:** Inverted class skew biases the global model toward false alarms, resulting in a **37.59% False Positive Rate**.
+
+### 3. Edge Latency and Computational Footprint
+Audited single-sample inference latency ($B=1$) on an AMD64 desktop CPU (`AMD64 Family 23 Model 160 Stepping 0`, 8 cores, Windows 11) using batch size 1 under a protocol of 50 warmup + 200 timed iterations:
+
+| Feature / Metric | Proposed CAN1DCNN | Random Forest (300 Trees) | Comparative Efficiency |
+|---|:---:|:---:|:---:|
+| **Trainable Parameters** | 40,610 FP32 weights | 466,156 tree nodes | **11.5× fewer decision parameters** |
+| **On-Disk Checkpoint Size** | **165.26 KB** (`.pt`) | **36,558.15 KB** (`.joblib`) | **221.2× smaller storage footprint** |
+| **Model-Only Latency (Single-Thread)** | **455.99 μs** (0.456 ms) | 30,440.80 μs (30.44 ms) | **CAN1DCNN is 66.8× faster** |
+| **Model-Only Latency (Multi-Thread)** | **455.99 μs** (0.456 ms) | 71,904.69 μs (71.90 ms) | **CAN1DCNN is 157.7× faster** |
+| **Decentralized FL Readiness** | **Native Gradient Exchange** | Non-trivial / Infeasible | Supports collaborative learning |
+
+> **Architectural Performance Driver:** Random Forest requires sequential or parallel traversal across 466,156 nodes, leading to frequent CPU cache misses and branch mispredictions. On a single $1 \times 176$ input vector, threadpool synchronization overhead doubles multi-threaded RF latency ($30.44\text{ ms} \to 71.90\text{ ms}$). In contrast, CAN1DCNN executes contiguous matrix multiply-accumulate (GEMM) operations accelerated by vectorized CPU instructions.
+>
+> *(Note: Due to high inter-loop timing variance in separate benchmark loops, end-to-end Random Forest latency is marked as unverified and omitted from comparative claims. Comparisons strictly reflect verified model-only inference latencies).*
+
+---
+
+## ⚔️ Threat Models & Defense Mechanisms
+
+### 1. Adversary Fleet Budget
+- 10 simulated vehicular clients, 10 communication rounds, Dirichlet $\alpha = 0.5$.
+- **2 out of 10 clients ($f=2$, 20% by client count)** are designated Byzantine attackers (`client_8` and `client_9`).
+- **Dirichlet Quantity Skew:** Due to non-uniform sample allocation, `client_8` and `client_9` control **$24.99\%$ to $39.65\%$ of all training samples** across seeds:
+  - **Seed 42:** 8,673 poisoned samples (**39.65%** of training pool).
+  - **Seed 43:** 5,467 poisoned samples (**24.99%** of training pool).
+  - **Seed 44:** 8,366 poisoned samples (**38.24%** of training pool).
+
+### 2. Evaluated Threat Vectors
+- **Attack A — Label Flipping (Data Poisoning):** Byzantine clients invert binary labels during local SGD ($y \mapsto 1 - y$). This pulls the global decision boundary to classify attack frames as normal and benign frames as intrusions.
+- **Attack B — Model-Update Sign Reversal (Byzantine Model Poisoning):** Byzantine clients compute legitimate local gradients but transmit inverted parameter updates:
+  $$\Delta_k' = -\gamma \cdot \Delta_k \quad (\gamma = 1.0) \implies \theta_k' = 2\theta^{(t-1)} - \theta_k^{(t)}$$
+  Under FedAvg, this causes complete global model collapse ($54.04\%$ Accuracy, $73.14\%$ FPR).
+
+### 3. Aggregation Rules
+- **FedAvg:** $\theta^{(t)} = \sum_{k} \frac{n_k}{N} \theta_k^{(t)}$ (Baseline linear weighted average).
+- **Coordinate-wise Median:** $\theta_j^{(t)} = \text{median}(\{\theta_{k, j}^{(t)}\}_{k=1}^K)$ for each weight coordinate $j$.
+- **Coordinate-wise Trimmed Mean:** $\theta_j^{(t)} = \frac{1}{K - 2m} \sum_{k=m+1}^{K-m} \theta_{(k), j}^{(t)}$ ($m=2$).
+- **Multi-Krum:** Computes pairwise Euclidean distance sums over $n - f - 2 = 6$ nearest neighbors and averages the top $m=6$ candidate models.
+
+---
+
+## ⚠️ Scientific Guardrails & Limitations
+
+To preserve strict academic integrity, all findings are bound by the following scope declarations:
+1. **Single-Vehicle Telemetry:** All experiments evaluate the HCRL Car-Hacking Dataset recorded from a single commercial Kia Soul vehicle.
+2. **Simulated Virtual Partitions:** The 10 federated clients are simulated partitions of one Kia Soul dataset, not actual physical vehicles or validated ECUs. They model virtual client partitions to assess algorithmic behavior under data heterogeneity.
+3. **Window Labelling Policy:** Non-overlapping contiguous 16-frame windows ($W=16, S=16$) are labeled as Attack ($y=1$) if at least one frame within the window is malicious (any-frame-positive). In sparse injection scenarios, this can slightly elevate false positive rates.
+4. **Privacy Scope:** Raw CAN records are not directly exchanged between clients and server; however, local model updates may leak information, and no formal differential privacy or cryptographic guarantee is provided.
+5. **Cross-OEM Generalization:** Findings reflect the evaluated dataset, partitioning, and model configurations; cross-vehicle and cross-OEM generalization has not been tested.
+6. **Desktop Benchmarking Scope:** Latency was profiled on an x86_64 desktop CPU in Python/PyTorch ($B=1$) to establish relative algorithmic complexity; it does not constitute embedded automotive microcontroller (ECU) hardware certification or hard real-time safety compliance.
+
+---
+
+## 🚀 Quickstart & Reproducibility
+
+### 1. Environment Setup
+```bash
+# Clone the repository
+git clone https://github.com/kritik8/Federated-IDS-CAN.git
+cd Federated-IDS-CAN
+
+# Create and activate virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
 ```
-Input: (Batch, 16 frames, 11 features) ──► Transpose to (Batch, 11 channels, 16 steps)
-  │
-  ├── Conv1D (11 ──► 32, k=3, p=1) + GroupNorm(4, 32) + ReLU + MaxPool(2)
-  ├── Conv1D (32 ──► 64, k=3, p=1) + GroupNorm(4, 64) + ReLU + MaxPool(2)
-  ├── Conv1D (64 ──► 128, k=3, p=1) + GroupNorm(4, 128) + ReLU + AdaptiveAvgPool(1)
-  │
-  └── Dropout(0.2) ──► Linear(128 ──► 64) ──► ReLU ──► Dropout(0.2) ──► Linear(64 ──► 2)
+
+### 2. Verify Test Suite
+The repository includes a comprehensive unit, integration, and regression invariant test suite:
+```bash
+python -m pytest tests
 ```
+*Expected Output: `53 passed in ~45s` with 0 failures and 0 warnings.*
 
-- **Feature Dimensions (11):** Normalized CAN ID ($[0, 1]$), normalized DLC ($[0, 1]$), 8 payload bytes ($D_0 \dots D_7 \in [0, 1]$), and domain-scaled log inter-arrival time ($\Delta t \in [0, 1]$).
-- **Parameters:** 40,610 trainable parameters (~158.6 KB state dict).
-- **Normalization:** `GroupNorm` with 4 groups per layer (replaces `BatchNorm1d` to eliminate running mean/variance divergence in distributed federated settings).
+### 3. Inspect Pre-Executed Notebooks & Results
+- `notebooks/01_dataset_analysis.ipynb`: Raw CAN exploratory data analysis.
+- `notebooks/02_preprocessing.ipynb`: Sliding window generation and chronological splits.
+- `notebooks/03_baseline_ids.ipynb`: Centralized 1D-CNN baseline execution.
+- `notebooks/04_federated_iid.ipynb`: Federated IID baseline evaluation.
+- `notebooks/05_federated_noniid.ipynb`: Non-IID Dirichlet heterogeneity benchmarks.
+- `notebooks/06_robust_federated_learning.ipynb`: Byzantine attacks and robust defenses.
 
----
-
-## 🌐 Phase 2A: IID Federated Learning Baseline
-
-In Phase 2A, 10 simulated vehicular clients were allocated balanced, stratified IID subsets of the training pool (~60.9% Normal, ~39.1% Attack). Clients trained locally for $E=1$ local epoch per round, communicating parameter updates to a server executing sample-weighted Federated Averaging (FedAvg).
-
-- **Result:** Achieved **98.25% Test Accuracy** and **97.66% F1-score** across 10 rounds, establishing the collaborative performance ceiling without centralizing raw CAN traces.
-
----
-
-## 🌐 Phase 2B: Non-IID Heterogeneity Experiments
-
-### What is Non-IID and Why Introduce It?
-Real connected vehicles do not experience identical driving traffic. One vehicle may be subjected to an active Denial-of-Service or bus-flooding attack, while nine other vehicles cruise under benign normal conditions.
-
-To rigorously model this fleet heterogeneity, we use the **Dirichlet distribution** $\text{Dir}(\alpha \cdot \mathbf{1}_K)$:
-- **What $\alpha$ (Alpha) Represents:**
-  - **$\alpha = 1.0$ (Moderate Skew):** Clients have unbalanced proportions of normal and attack traffic, but all clients have access to most traffic categories.
-  - **$\alpha = 0.5$ (High Skew):** Pronounced heterogeneity. Several clients lack exposure to specific cyber-attack types.
-  - **$\alpha = 0.1$ (Extreme Skew):** Severe specialization. Multiple clients observe 100% cyber-attack traffic with 0 normal samples, while other clients observe >90% normal traffic.
-- **Attack-Type-Aware Partitioning:** The 5 underlying training categories (Normal, DoS, Fuzzy, Gear, RPM) are partitioned via Dirichlet allocation and mapped back to binary labels ($y \in \{0, 1\}$). This creates realistic attack-exposure diversity while preserving the binary IDS task.
-- **Feasibility Constraint:** Rejection sampling ensures every client has at least 64 samples to enable valid mini-batch gradient descent.
-
----
-
-## ⚔️ Phase 3: Robust Federated Learning Under Adversarial Attacks
-
-In open vehicular networks, malicious or compromised ECUs can inject poisoning attacks to degrade global detection or induce false alarms. Phase 3 systematically assesses vulnerabilities and evaluates robust aggregation algorithms.
-
-### Threat Model
-- **Network Setting:** 10 simulated clients, Non-IID Dirichlet distribution ($\alpha = 0.5$), 10 communication rounds.
-- **Adversary Budget:** 2 malicious clients ($f=2$, 20% of fleet), specifically designated as `client_0` and `client_1`.
-- **Attack A — Label Flipping (Data Poisoning):**
-  - Malicious clients invert all training labels: $y \mapsto 1 - y$ ($0 \to 1$ and $1 \to 0$).
-  - Malicious clients train honestly on their poisoned data using standard local SGD.
-  - Validation sets, test sets, and attack-type evaluation metadata remain strictly untouched.
-  - Logged: `client_0` flipped 1,845 labels (100%), `client_1` flipped 2,427 labels (100%).
-- **Attack B — Model-Update Corruption via Delta Sign Reversal (Byzantine Model Poisoning):**
-  - Malicious clients train on their legitimate local data, but instead of sending honest updates, they submit corrupted model deltas:
-    $$\Delta_k' = -\gamma \cdot \Delta_k \quad \text{where } \Delta_k = \theta_k^{(t)} - \theta^{(t-1)}$$
-  - In our benchmark, $\gamma = 1.5$. The poisoned transmitted state is $\theta_k' = \theta^{(t-1)} + \Delta_k'$.
-  - This directly pulls the global model away from optimal convergence.
-
-### Defense Mechanisms (Aggregation Rules)
-1. **Sample-Weighted FedAvg:** Baseline linear weighted average: $\theta^{(t)} = \sum_{k} \frac{n_k}{N} \theta_k^{(t)}$. Completely vulnerable to outliers and sign-inverted updates.
-2. **Coordinate-wise Median:** For each scalar coordinate $j$ of each parameter tensor, compute the median across all $K$ client updates:
-   $$\theta_j^{(t)} = \text{median}(\{\theta_{k, j}^{(t)}\}_{k=1}^K)$$
-   Tolerates up to $f < K/2$ arbitrary Byzantine clients without divergence.
-3. **Coordinate-wise Trimmed Mean:** For each coordinate $j$, sort the $K$ client values, discard the lowest $m$ and highest $m$ values ($m=2$), and average the remaining $K - 2m$ values:
-   $$\theta_j^{(t)} = \frac{1}{K - 2m} \sum_{k=m+1}^{K-m} \theta_{(k), j}^{(t)}$$
-
----
-
-## 📊 Results: Centralized vs. IID vs. Non-IID vs. Robust FL
-
-All models were evaluated on the untouched test partition (4,690 windows: 2,900 Normal, 1,790 Attack) using the best checkpoint selected by Validation F1:
-
-### Primary Matched Comparison ($\alpha = 0.5$, Seed 42)
-
-| Threat Scenario | Aggregator | Best Rd | Val F1 (%) | Test Acc (%) | Test Prec (%) | Test Recall (%) | Test F1 (%) | FPR (%) | FNR (%) | ROC-AUC |
-|---|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **Centralized Baseline** | Centralized | Ep 8 | 99.42% | **99.66%** | 99.61% | **99.50%** | **99.55%** | 0.24% | **0.50%** | **0.9992** |
-| **IID Baseline** | FedAvg | Rd 9 | 97.99% | **98.25%** | 99.71% | 95.70% | **97.66%** | 0.17% | 4.30% | 0.9965 |
-| **Non-IID Benign** | FedAvg | Rd 10 | 98.17% | **98.72%** | 99.60% | 97.04% | **98.30%** | 0.24% | 2.96% | 0.9964 |
-| **Non-IID Benign** | Median | Rd 10 | 97.82% | **98.51%** | 98.81% | 97.26% | **98.03%** | 0.72% | 2.74% | 0.9956 |
-| **Non-IID Benign** | Trimmed Mean | Rd 10 | 97.80% | **98.34%** | 99.42% | 96.20% | **97.79%** | 0.34% | 3.80% | 0.9955 |
-| **Attack A: Label Flip** | **FedAvg** | Rd 10 | 93.35% | **94.63%** | 99.87% | **86.03% ⚠️** | **92.44%** | **0.07%** | **13.97% ⚠️** | 0.9932 |
-| **Attack A: Label Flip** | **Median** | Rd 9 | 96.59% | **97.14%** | 95.05% | **97.60% ✅** | **96.31%** | 3.14% | **2.40% ✅** | 0.9945 |
-| **Attack A: Label Flip** | **Trimmed Mean** | Rd 9 | 97.15% | **97.51%** | 96.19% | **97.32% ✅** | **96.75%** | 2.38% | **2.68% ✅** | 0.9946 |
-| **Attack B: Update Corrupt**| **FedAvg** | Rd 2 | 55.47% | **38.17% 💥** | 38.17% | **100.00%** | **55.25% 💥** | **100.00% 💥**| **0.00%** | 0.5861 |
-| **Attack B: Update Corrupt**| **Median** | Rd 9 | 96.75% | **97.31%** | 97.17% | **95.75% ✅** | **96.45%** | 1.72% | **4.25% ✅** | 0.9934 |
-| **Attack B: Update Corrupt**| **Trimmed Mean** | Rd 10 | 96.70% | **97.06%** | 95.94% | **96.37% ✅** | **96.15%** | 2.52% | **3.63% ✅** | 0.9936 |
-
-### Multi-Seed Statistical Stability (Seeds 42, 43, 44; Mean ± Std)
-
-To guarantee that findings are robust and not an artifact of a single lucky seed, we repeated the key experiments across 3 independent seeds:
-
-| Threat Scenario | Aggregator | Test Accuracy Mean ± Std (%) | Test F1 Mean ± Std (%) | Test FPR Mean ± Std (%) | Test FNR Mean ± Std (%) |
-|---|---|:---:|:---:|:---:|:---:|
-| **Benign Fleet** | **FedAvg** | 97.96% ± 0.54% | **97.27% ± 0.73%** | 0.45% ± 0.20% | 4.62% ± 1.23% |
-| **Benign Fleet** | **Median** | 96.93% ± 1.76% | **95.97% ± 2.26%** | 1.97% ± 2.16% | 4.86% ± 1.54% |
-| **Benign Fleet** | **Trimmed Mean**| 97.56% ± 0.83% | **96.77% ± 1.07%** | 1.11% ± 1.09% | 4.58% ± 0.56% |
-| **Attack A: Label Flipping** | **FedAvg** | 74.55% ± 26.17% | **78.56% ± 16.99% ⚠️** | 35.37% ± 45.77% | 9.39% ± 5.59% |
-| **Attack A: Label Flipping** | **Median** | **95.19% ± 2.82%** | **93.75% ± 3.57% ✅** | **3.91% ± 3.38%** | **6.28% ± 2.93%** |
-| **Attack A: Label Flipping** | **Trimmed Mean**| 93.06% ± 6.26% | **91.97% ± 6.64%** | 9.01% ± 10.90% | 3.59% ± 1.87% |
-| **Attack B: Update Corrupt** | **FedAvg** | 54.04% ± 17.76% | **63.43% ± 10.45% 💥** | 73.14% ± 28.39% 💥 | 1.94% ± 2.32% |
-| **Attack B: Update Corrupt** | **Median** | **95.10% ± 2.61%** | **93.60% ± 3.24% ✅** | **3.53% ± 3.68%** | **7.13% ± 2.04%** |
-| **Attack B: Update Corrupt** | **Trimmed Mean**| 77.20% ± 27.60% | **82.14% ± 19.02%** | 34.23% ± 46.52% | 4.28% ± 3.79% |
-
-*(Note: Standard deviations computed across seeds [42, 43, 44] using ddof=0 matching JSON artifacts; ddof=1 sample std is ±20.80% for Label Flip FedAvg and ±4.38% for Median).*
-
-### Per-Attack-Type Recall Analysis under Poisoning (Seed 42)
-
-| Cyber-Attack Class | Test Windows | Benign FedAvg | Label Flip FedAvg | Label Flip Median | Update Corrupt FedAvg | Update Corrupt Median |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|
-| **Gear Spoofing** | 591 | 99.32% | **94.08% ⚠️** | 98.98% | 100.00%* | 97.46% |
-| **RPM Spoofing** | 592 | 100.00% | **72.64% ⚠️** | 100.00% | 100.00%* | 98.82% |
-| **DoS Injection** | 398 | 98.24% | 96.23% | 98.24% | 100.00%* | 97.74% |
-| **Fuzzy Injection** | 209 | 79.90% | 81.82% | 85.65% | 100.00%* | 78.47% |
-
-*\*Note: Under Update Corruption, FedAvg classified 100% of samples as attacks (FPR = 100.00%), which rendered the IDS operationally unusable.*
-
-> **Operational Insight:** Under Label Flipping, FedAvg misses **27.4% of RPM sensor spoofing attacks** (162 missed frames) and **5.9% of Gear spoofing attacks** because malicious clients 8 and 9 held substantial telemetry for those IDs and flipped their labels. Coordinate-wise Median fully restores RPM detection to 100.00% and Gear to 98.98% without requiring centralized data.
-
----
-
-### Key Scientific Takeaways:
-1. **Catastrophic Failure of FedAvg Under Adversarial Attacks:**
-   - Under **Attack A (Label Flipping)**, FedAvg's test recall plummets to 86.03% (FNR spikes from 2.74% to 13.97%, missing 250 attacks). Across multiple seeds, recall deteriorates as low as 43.18%.
-   - Under **Attack B (Model-Update Sign Reversal)**, FedAvg experiences complete network collapse (Test F1 = 55.25%, Accuracy = 38.17%, FPR = 100.00%), classifying every normal frame as an attack.
-2. **Coordinate-wise Median is the Most Reliable Defense:**
-   - Median recovers detection across both attack modalities to $>96.4\%$ F1 on seed 42 and $>93.6\%$ F1 across independent seeds.
-   - It incurs a negligible benign utility penalty of only 0.27% relative to FedAvg.
-3. **Non-IID Vulnerability in Trimmed Mean:**
-   - While Trimmed Mean performs admirably on seed 42 (96.77% F1), it exhibits substantial multi-seed volatility ($82.14\% \pm 19.02\%$ F1). Under Non-IID Dirichlet partitioning, natural client drift causes honest clients with specialized local data distributions to appear in the outer $m$ tails, leading Trimmed Mean to discard honest updates rather than poisoned ones.
-4. **Operational Trade-offs:**
-   - An IDS must balance False Negative Rate (missed intrusions that compromise vehicular safety) against False Positive Rate (nuisance alarms that degrade driver confidence). FedAvg fails on both extremes (FNR = 31.25% under label flipping; FPR = 73.14% under update corruption), whereas Coordinate-wise Median maintains a balanced operating point.
-
----
-
-## ⚖️ Important Methodological Decisions
-
-1. **Chronological Per-Scenario Splitting:** Random shuffling destroys temporal packet dynamics and leaks messages. We enforce strict chronological ordering (70% train, 15% val, 15% test).
-2. **16-Frame Sliding Windows ($S=W=16$):** Grouping into 16 consecutive frames captures frequency bursts without frame overlap.
-3. **GroupNorm over BatchNorm:** `GroupNorm` normalizes per sample across 4 channel groups, avoiding the catastrophic running statistics divergence that affects `BatchNorm1d` under Non-IID data.
-4. **Domain-Based Normalization:** Protocol constants (CAN ID by 2047.0, DLC by 8.0, payload by 255.0, inter-arrival time by physical maximum) prevent dataset leakage.
-5. **Leak-Free Initial Inter-Arrival Time:** Frame 0 inter-arrival time is initialized to 0.0, reflecting monitoring inception without future timestamp consumption.
-6. **Best Validation Checkpoint Selection:** Selected strictly by validation F1 score, keeping the test set untouched until post-training evaluation.
-7. **Strict Parameter Compatibility:** Aggregators validate parameter tensor keys, shapes, and floating-point types before aggregation.
-
----
-
-## ⚠️ Current Limitations
-
-- **Simulated Clients:** The 10 clients are simulated partitions of a single Kia Soul capture dataset, rather than 10 physically distinct vehicles with varied ECU architectures.
-- **Privacy Limitations:** Federated learning keeps raw CAN frames local, but does not provide formal privacy guarantees (such as $(\epsilon, \delta)$-differential privacy) against reconstruction or membership inference attacks.
-- **Threat Model Scope:** Our evaluations focused on untargeted label flipping and model update sign-reversal. Stealthy backdoor attacks designed to evade coordinate-wise statistics require dedicated cosine or spectral defenses (e.g., FoolsGold).
-- **Trimmed Mean Non-IID Sensitivity:** In extreme Non-IID fleets, static trimming fractions can discard legitimate minority-class client updates.
-
----
-
-## 🧭 Next Step
-
-```text
-NEXT:
-Phase 3B — Evaluate advanced Byzantine defenses (Multi-Krum, FoolsGold) against targeted backdoors 
-and adaptive poisoning in heterogeneous vehicular networks.
-```
+### 4. Authoritative Metrics and Reports
+- Master verified results table: [`results/metrics/final_verified_results.csv`](results/metrics/final_verified_results.csv)
+- Latency and speedup reconciliation: [`final_audit_2026/LATENCY_SPEEDUP_RECONCILIATION.md`](final_audit_2026/LATENCY_SPEEDUP_RECONCILIATION.md)
+- Non-IID result reconciliation: [`final_audit_2026/NONIID_RESULT_RECONCILIATION.md`](final_audit_2026/NONIID_RESULT_RECONCILIATION.md)
+- Implementation freeze report: [`final_audit_2026/FINAL_IMPLEMENTATION_FREEZE_REPORT.md`](final_audit_2026/FINAL_IMPLEMENTATION_FREEZE_REPORT.md)
+- Post-freeze verification report: [`POST_FREEZE_VERIFICATION_REPORT.md`](POST_FREEZE_VERIFICATION_REPORT.md)
 
 ---
 
 ## 📁 Repository Structure
 
-```
+```text
 Federated-IDS-CAN/
 │
-├── data/
-│   ├── raw/                 # Raw HCRL captures (DoS, Fuzzy, Gear, RPM, Normal) [.gitignore]
-│   ├── processed/           # can_ids_processed_dataset.npz, metadata.json [.gitignore]
-│   └── splits/              # train_split.npz, val_split.npz, test_split.npz [.gitignore]
+├── configs/                                # Experiment configurations
+│   ├── random_forest_config.json           # 300-estimator Random Forest baseline config
+│   └── robust_federated_config.json        # Threat models and robust aggregator settings
 │
-├── src/
-│   ├── data/                # loader.py (dynamic variable DLC CSV parsing)
-│   ├── preprocessing/       # parser.py, pipeline.py (features, windowing, split)
-│   ├── models/              # cnn1d.py (CAN1DCNN with GroupNorm)
-│   ├── evaluation/          # metrics.py (metrics computation, latency profiling)
-│   └── federated/           # dataset.py, client.py, server.py, aggregation.py, threat.py
+├── src/                                    # Core implementation modules
+│   ├── data/                               # Dynamic variable DLC CSV loader
+│   ├── preprocessing/                      # 11-feature parser, windowing, and chronological splitter
+│   ├── models/                             # CAN1DCNN with GroupNorm (G=4)
+│   ├── evaluation/                         # Metric calculations, confusion matrices, latency profiler
+│   └── federated/                          # Client SGD, Server routing, Threat models, Aggregation rules
 │
-├── notebooks/
-│   ├── 01_dataset_analysis.ipynb   # Executed EDA, CAN ID & class distributions
-│   ├── 02_preprocessing.ipynb      # Executed feature extraction & splitting
-│   ├── 03_baseline_ids.ipynb       # Executed centralized baseline training & evaluation
-│   ├── 04_federated_iid.ipynb       # Executed Phase 2A IID Federated baseline (10 clients, FedAvg)
-│   ├── 05_federated_noniid.ipynb    # Executed Phase 2B Non-IID Dirichlet benchmark (alpha in {1.0, 0.5, 0.1})
-│   └── 06_robust_federated_learning.ipynb # Executed Phase 3 Robust FL & Byzantine defense benchmark
+├── tests/                                  # Automated test suite (53 tests passing)
+│   ├── test_loader.py                      # CSV parsing and variable DLC verification
+│   ├── test_models.py                      # Tensor shape propagation and GroupNorm invariant
+│   ├── test_preprocessing.py               # Feature normalization and sliding window bounds
+│   ├── test_metrics.py                     # Metric calculation edge cases and warning suppression
+│   ├── test_federated.py                   # Client training and server communication loops
+│   ├── test_robust_aggregation.py          # Median, Trimmed Mean, and threat model tests
+│   ├── test_multi_krum.py                  # Multi-Krum formulation, bounds, and dispatching
+│   └── test_validation_invariants.py       # Multi-seed ddof=1, Non-IID integrity, speedup ratios
 │
-├── results/
-│   ├── figures/             # Confusion matrices, training curves, robust comparison plots
-│   ├── metrics/             # centralized, IID, Non-IID, and robust FL experiment JSON metrics
-│   ├── models/              # Checkpoints for centralized, IID, Non-IID, and robust models (.pt)
-│   └── reports/             # centralized_baseline_v2.md, federated_iid_report.md, federated_noniid_report.md, robust_federated_report.md
+├── results/                                # Experimental outputs and artifacts
+│   ├── baseline_multiseed/                 # Centralized 1D-CNN runs (Seeds 42, 43, 44)
+│   ├── iid_multiseed/                      # Federated IID runs (Seeds 42, 43, 44)
+│   ├── noniid_multiseed/                   # Non-IID Dirichlet runs (α in {1.0, 0.5, 0.1})
+│   ├── metrics/                            # Authoritative final CSV and JSON benchmark summaries
+│   │   ├── final_verified_results.csv      # Master comparison table across all 17 configurations
+│   │   ├── final_verified_results.json     # Machine-readable authoritative metrics
+│   │   └── latency_and_size_audit.json     # Hardware latency and model size benchmark logs
+│   └── figures/                            # Publication-ready visualizations (300 DPI)
+│       ├── system_architecture.png         # Framework pipeline and threat model diagram
+│       ├── centralized_cnn_vs_rf_comparison.png # 1D-CNN vs. Random Forest comparative bar chart
+│       ├── multikrum_vs_robust_aggregators_f1.png # Grouped F1 comparison under poisoning
+│       └── robust_per_attack_recall_attack_b.png # Per-attack recall breakdown under Attack B
 │
-├── configs/                 # baseline_config.json, federated_iid_config.json, federated_noniid_config.json, robust_federated_config.json
-├── tests/                   # test_loader.py, test_models.py, test_preprocessing.py, test_federated.py, test_robust_aggregation.py
+├── final_audit_2026/                       # Independent scientific audit and reconciliation reports
+│   ├── FINAL_IMPLEMENTATION_FREEZE_REPORT.md # Official implementation freeze document
+│   ├── NONIID_RESULT_RECONCILIATION.md     # Forensic analysis of Non-IID performance
+│   ├── LATENCY_SPEEDUP_RECONCILIATION.md   # Mathematical derivation of latency speedups
+│   ├── FINAL_FREEZE_MANIFEST.md            # Complete file and artifact inventory
+│   └── POST_FREEZE_VERIFICATION_REPORT.md  # Read-only audit and errata verification
 │
-├── README.md
-├── requirements.txt
-├── .gitignore
-├── LICENSE
-└── AUDIT_REPORT.md
+├── notebooks/                              # Pre-executed Jupyter research notebooks (01 to 06)
+├── README.md                               # This documentation
+└── requirements.txt                        # Environment dependency specification
 ```
 
 ---
 
-## ⚡ Quickstart
+## 📜 Citation & License
 
-### 1. Environment Setup
-```bash
-git clone https://github.com/kritik8/Federated-IDS-CAN.git
-cd Federated-IDS-CAN
-python -m venv .venv
-# Windows:
-.venv\Scripts\activate
-# Linux/macOS:
-source .venv/bin/activate
+This project is licensed under the [MIT License](LICENSE). If you utilize this implementation or benchmark results in academic research, please cite:
 
-pip install -r requirements.txt
+```bibtex
+@misc{federated_ids_can_2026,
+  title={Robust Federated Learning-Based Intrusion Detection for Heterogeneous Vehicular CAN Networks},
+  author={Jain, Kritik},
+  year={2026},
+  howpublished={\url{https://github.com/kritik8/Federated-IDS-CAN}}
+}
 ```
-
-### 2. Run Test Suite (35 Unit Tests)
-```bash
-python -m unittest discover tests
-```
-
-### 3. Run Pipeline via Notebooks
-```bash
-# Phase 1: Centralized Pipeline
-jupyter nbconvert --to notebook --execute --inplace notebooks/01_dataset_analysis.ipynb
-jupyter nbconvert --to notebook --execute --inplace notebooks/02_preprocessing.ipynb
-jupyter nbconvert --to notebook --execute --inplace notebooks/03_baseline_ids.ipynb
-
-# Phase 2A: Federated IID Baseline (10 Clients, FedAvg)
-jupyter nbconvert --to notebook --execute --inplace notebooks/04_federated_iid.ipynb
-
-# Phase 2B: Non-IID Dirichlet Experiments (alpha in {1.0, 0.5, 0.1})
-jupyter nbconvert --to notebook --execute --inplace notebooks/05_federated_noniid.ipynb
-
-# Phase 3: Robust Federated Learning Against Malicious Clients
-jupyter nbconvert --to notebook --execute --inplace notebooks/06_robust_federated_learning.ipynb
-```
-
----
-
-## 📄 License
-This project is licensed under the [MIT License](LICENSE).
